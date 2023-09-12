@@ -6,5 +6,5 @@ Transformer_token.ipynb: defines a transformer taking in token ids. For example,
 
 Transformer_number.ipynb: defines a transformer taking in numbers. For example, multiplying two numbers.
 
-Disclaimer: these models may have many variants. These implementations are what Ziming finds widely used and are as simple as possible. It is likely that for some tasks, you need to change the archetectures to make it work or interpretable.
+Disclaimer: These models may have many variants. The implementations in this folder are what Ziming finds widely used and are as simple as possible. It is likely that for some tasks, you need to change the archetectures to make it work or interpretable.
 
