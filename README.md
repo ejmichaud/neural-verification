@@ -17,3 +17,12 @@
 \_______________________/<------------------------------------------------------+
 ```
 
+## Installing 
+
+We've defined a tokenizer and transformer implementation inside of the `neural-verification` module, which you can install with:
+
+```
+pip install -e neural_verification
+```
+This requires PyTorch
+
