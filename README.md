@@ -17,12 +17,32 @@
 \_______________________/<------------------------------------------------------+
 ```
 
-## Installing 
+## Structure
+```
+.
+├── literature
+├── models
+├── neural_verification
+│   ├── neural_verification.py
+│   └── setup.py
+├── README.md
+└── tasks
+    ├── palindromes
+        ├── config.py
+        ├── create_dataset.py
+        └── train.py
+    ...
+```
+For each task, we create a directory under `tasks/` and create scripts for defining the dataset and for training a network. At a minimum, the code in a task's directory should produce train and test datasets for the task and also save the weights of a model which was trained on the train set and achieves good performance on the test set. Do not commit large files to git! Datasets and model weights, unless they are extremely small, should be uploaded to a shared Dropbox folder.
 
-We've defined a tokenizer and transformer implementation inside of the `neural-verification` module, which you can install with:
+
+## Installation
+
+We've defined several helpful objects (data loaders, tokenizer, and a transformer implementation inside of the `neural-verification` module, which you can install with:
 
 ```
 pip install -e neural_verification
 ```
 This requires PyTorch
+
 
