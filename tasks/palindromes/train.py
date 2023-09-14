@@ -50,7 +50,14 @@ def compute_loss(input_ids, output, answer_idxs):
 def compute_accuracy(input_ids, output, answer_idxs):
     """Computes the mean accuracy of a transformer's `output`. This is
     the accuracy computed from greedy sampling (zero temperature)
-    in predicting the next token in `input_ids` at positions `answer_idxs`
+    in predicting the next token in `input_ids` at positions `answer_idxs`.
+
+    Note that this is not in general an exact string match accuracy. It is
+    an exact string match when there is only one answer_idx per sequence. 
+    However, when the "answer" part of the sequence is spread across multiple 
+    tokens, we are computing a per-token accuracy rather than a per-answer
+    accuracy. You may want to modify this if your answer is spread across
+    multiple tokens.
     
     :param input_ids: torch.Tensor of shape (batch_size, seq_len)
     :param output: torch.Tensor of shape (batch_size, seq_len, vocab_size)
