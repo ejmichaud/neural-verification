@@ -38,7 +38,7 @@ For each task, we create a directory under `tasks/` and create scripts for defin
 
 ## Installation
 
-We've defined several helpful objects (data loaders, tokenizer, and a transformer implementation inside of the `neural-verification` module, which you can install with:
+We've defined several helpful objects (data loaders, tokenizer, and a transformer implementation) inside of the `neural-verification` module, which you can install with:
 
 ```
 pip install -e neural_verification
