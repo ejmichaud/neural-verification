@@ -33,7 +33,7 @@
         └── train.py
     ...
 ```
-For each task, we create a directory under `tasks/` and create scripts for defining the dataset and for training a network. At a minimum, the code in a task's directory should produce train and test datasets for the task and also save the weights of a model which was trained on the train set and achieves good performance on the test set. Do not commit large files to git! Datasets and model weights, unless they are extremely small, should be uploaded to a shared Dropbox folder.
+For each task, we create a directory under `tasks/` and create scripts for defining the dataset and for training a network. At a minimum, the code in a task's directory should produce train and test datasets for the task and also save the weights of a model which was trained on the train set and achieves good performance on the test set. Do not commit large files to git! Datasets and model weights, unless they are extremely small, should be uploaded to the shared Dropbox folder: https://www.dropbox.com/scl/fo/deeu5ifrpi8vn8hnujlwc/h?rlkey=zpo1ebv08wazrzrxc7rpn9pct&dl=0
 
 
 ## Installation
