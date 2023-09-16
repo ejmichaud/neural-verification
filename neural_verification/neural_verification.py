@@ -8,6 +8,8 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+import numpy as np
+
 
 
 def cycle(iterable):
@@ -205,7 +207,7 @@ class CausalSelfAttention(nn.Module):
         y = self.resid_dropout(self.c_proj(y))
         return y
 
-class MLP(nn.Module):
+class MLPLayer(nn.Module):
 
     def __init__(self, config):
         super().__init__()
@@ -229,7 +231,7 @@ class Block(nn.Module):
             self.ln_1 = LayerNorm(config.n_embd, bias=config.bias)
             self.ln_2 = LayerNorm(config.n_embd, bias=config.bias)
         self.attn = CausalSelfAttention(config)
-        self.mlp = MLP(config)
+        self.mlp = MLPLayer(config)
         self.layer_norm = config.layer_norm
 
     def forward(self, x):
@@ -394,3 +396,76 @@ class Transformer(nn.Module):
 
         return idx
         
+        
+        
+@dataclass
+class MLPConfig:
+    block_size: int = 64
+    in_dim: int = 2
+    out_dim: int = 1
+    width: int = 40
+    depth: int = 2 # note: depth is the #(linear layers), and #(hidden layers) = #(linear layers) - 1.
+    
+class MLP(nn.Module):
+    def __init__(self, in_dim=2, out_dim=2, width=2, depth=2):
+        super(MLP, self).__init__()
+        
+        shp = [in_dim] + [width]*(depth-1) + [out_dim]
+        self.in_dim = in_dim
+        self.out_dim = out_dim
+        self.depth = depth
+
+        linear_list = []
+        for i in range(self.depth):
+            linear_list.append(nn.Linear(shp[i], shp[i+1]))
+        self.linears = nn.ModuleList(linear_list)
+        self.shp = shp
+    
+    def forward(self, x):
+        
+        # input shape = (batch_size, input_dim)
+        # define activation here
+        #f = lambda x: 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
+        f = torch.nn.SiLU()
+        for i in range(self.depth-1):
+            x = f(self.linears[i](x))
+        x = self.linears[-1](x)
+        # output shape = (batch_size, output_dim)
+        return x
+    
+@dataclass
+class RNNConfig:
+    input_dim: int = 2
+    output_dim: int = 1
+    hidden_dim: int = 40
+    
+    
+class RNN(nn.Module):
+    def __init__(self, hidden_dim, input_dim=2, output_dim=1, device='cpu'):
+        super(RNN, self).__init__()
+
+        # Defining some parameters
+        self.hidden_dim = hidden_dim
+        self.Wh = nn.Linear(hidden_dim, hidden_dim)
+        self.Wx = nn.Linear(input_dim, hidden_dim)
+        self.Wy = nn.Linear(hidden_dim, output_dim)
+        self.act = nn.Sigmoid()
+        #self.act = lambda x: x
+        self.device = device
+    
+    def forward(self, x):
+        
+        # x shape: (batch size, sequence length, input_dim)
+        batch_size = x.size(0)
+        seq_length = x.size(1)
+
+        hidden = torch.zeros(batch_size, self.hidden_dim).to(self.device)
+        outs = []
+
+        for i in range(seq_length):
+            hidden = self.act(self.Wh(hidden) + self.Wx(x[:,i,:]))
+            out = self.Wy(hidden)
+            outs.append(out)
+            
+        # out shape: (batch size, sequence length, output_dim)
+        return torch.stack(outs).permute(1,0,2)
