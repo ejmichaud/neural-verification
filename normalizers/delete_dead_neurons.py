@@ -5,13 +5,16 @@ import numpy as np
 from neural_verification import MLP
 
 
+# This threshold tells the program how dead a neuron must be to be considered "dead". For any given neuron, it is 1.1 times the product of L2 norms of the vectors of incoming and outgoing weights.
 prune_threshold = 0.32
 
 def figure_out_which_neurons_to_prune(weights):
     """
+    A function to determine which neurons we should prune if given the weights. ie. try to detect neurons which do nothing.
+
     weights: a length N list of [out_dim, in_dim] weight tensors for the MLP.
     
-    returns: a length N-1 list of length n_neurons lists of booleans - True if that neuron in the ith hidden layer should be removed, false otherwise.
+    returns: a length N-1 list of length n_neurons lists of booleans - True if that neuron in that hidden layer should be removed, false otherwise.
     """
     neurons_to_prune = []
     for layer in range(len(weights)-1):
@@ -27,8 +30,7 @@ def figure_out_which_neurons_to_prune(weights):
 
 def prune_neurons(weights, biases, neurons_to_prune):
     """
-    Cut out all the neurons that prune_neurons says to cut out.
-    This function modifies weights and biases in place.
+    A function that cuts out all the neurons that should be pruned, and modifies the weights and biases in place. prune_neurons determines which weights and biases to cut out.
     """
     for layer in range(len(weights)-1):
         for neuron_num in reversed(range(weights[layer].shape[0])):
@@ -40,6 +42,7 @@ def prune_neurons(weights, biases, neurons_to_prune):
 
 def expand_to_shape(weights, biases, shp):
     """
+    This function takes in weights and biases for a neural network of a smaller shape and expands the weights and biases with dead neurons until it fills a given shape shp.
     This function modifies weights and biases in place.
     """
     for layer in range(len(weights)-1):
@@ -50,29 +53,39 @@ def expand_to_shape(weights, biases, shp):
 
 
 
+# Load the weights and biases from sample_model.pt
 original_weights = torch.load('sample_model.pt', map_location=torch.device('cpu'))
 original_shape = [original_weights['linears.0.bias'].shape[0]] + [original_weights['linears.' + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
 weights = [original_weights['linears.' + str(i) + '.weight'].numpy() for i in range(int(len(original_weights)//2))]
 biases = [original_weights['linears.' + str(i) + '.bias'].numpy() for i in range(int(len(original_weights)//2))]
 
+# Figure out which neurons are dead and should be pruned
 neurons_to_prune = figure_out_which_neurons_to_prune(weights)
+
+# Prune dead neurons
 prune_neurons(weights, biases, neurons_to_prune)
+
+# Fill the dead neurons with zeroed out neurons
 expand_to_shape(weights, biases, original_shape)
+
+# Count the neurons which have been pruned and how many remain
 n_pruned_neurons = sum([sum(list(map(int, layer))) for layer in neurons_to_prune])
 new_shape = [original_shape[0]] + [sum([1-int(x) for x in layer]) for layer in neurons_to_prune] + [original_shape[-1]]
 n_unpruned_neurons = sum(new_shape[1:-1])
 
+# Put the new weights and biases into a data structure that can be loaded into a pytorch model
 weights = {'linears.'+str(i)+'.weight':torch.from_numpy(weights[i]) for i in range(len(weights))}
 biases = {'linears.'+str(i)+'.bias':torch.from_numpy(biases[i]) for i in range(len(biases))}
 new_weights = {**weights, **biases}
 
+# Put the new weights and biases into modified_model.pt
 depth=int(len(new_weights)//2)
+width=new_weights['linears.0.weight'].shape[0]
 in_dim=new_weights['linears.0.weight'].shape[1]
 out_dim=new_weights['linears.' + str(depth-1) + '.weight'].shape[0]
-width=new_weights['linears.0.weight'].shape[0]
-
 model = MLP(in_dim=in_dim, out_dim=out_dim, width=width, depth=depth)
 model.load_state_dict(new_weights)
 model.shp = [new_weights['linears.0.bias'].shape[0]] + [new_weights['linears.' + str(i) + '.bias'].shape[0] for i in range(int(len(new_weights)//2))]
 torch.save(model.state_dict(), 'modified_model.pt')
+
 print(str(n_pruned_neurons) + ' hidden neurons pruned, ' + str(n_unpruned_neurons) + ' hidden neurons left. Original shape: ' + str(original_shape) + '. New shape: ' + str(new_shape))
