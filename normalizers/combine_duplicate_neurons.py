@@ -32,9 +32,9 @@ def try_to_combine_neurons(weights, biases):
                     avg_weight = (in_weights_1 + in_weights_2) / 2
                     avg_bias = (biases[layer][neuron_num_1] + biases[layer][neuron_num_2]) / 2
                     total_output = out_weights_1 + out_weights_2
-                    weights[layer] = np.concatenate([weights[layer][:neuron_num_1,:], weights[layer][neuron_num_1+1:neuron_num_2,:], weights[layer][neuron_num_2+1:,:], avg_weight[np.newaxis,:], np.zeros([1, weights[layer].shape[1]])], axis=0)
-                    weights[layer+1] = np.concatenate([weights[layer+1][:,:neuron_num_1], weights[layer+1][:,neuron_num_1+1:neuron_num_2], weights[layer+1][:,neuron_num_2+1:], total_output[:,np.newaxis], np.zeros([weights[layer+1].shape[0], 1])], axis=1)
-                    biases[layer] = np.concatenate([biases[layer][:neuron_num_1], biases[layer][neuron_num_1+1:neuron_num_2], biases[layer][neuron_num_2+1:], np.array([avg_bias, 0])], axis=0)
+                    weights[layer] = np.concatenate([avg_weight[np.newaxis,:], weights[layer][:neuron_num_1,:], weights[layer][neuron_num_1+1:neuron_num_2,:], weights[layer][neuron_num_2+1:,:], np.zeros([1, weights[layer].shape[1]])], axis=0)
+                    weights[layer+1] = np.concatenate([total_output[:,np.newaxis], weights[layer+1][:,:neuron_num_1], weights[layer+1][:,neuron_num_1+1:neuron_num_2], weights[layer+1][:,neuron_num_2+1:], np.zeros([weights[layer+1].shape[0], 1])], axis=1)
+                    biases[layer] = np.concatenate([np.array([avg_bias]), biases[layer][:neuron_num_1], biases[layer][neuron_num_1+1:neuron_num_2], biases[layer][neuron_num_2+1:], np.array([0])], axis=0)
                     return (layer, neuron_num_1, neuron_num_2, norm)
     return False
 
