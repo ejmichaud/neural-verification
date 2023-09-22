@@ -1,0 +1,1 @@
+sbatch tasks/kth_root_of_n/kth_root_of_n.sh
