@@ -375,12 +375,16 @@ class Transformer(nn.Module):
         Take a conditioning sequence of indices idx (LongTensor of shape (b,t)) and complete
         the sequence max_new_tokens times, feeding the predictions back into the model each time.
         Most likely you'll want to make sure to be in model.eval() mode of operation for this.
+
+        Note that sampling at actually zero temperature is not supported currently. To sample
+        at zero temperature, pass in something like temperature=1e-6 instead.
+        TODO: implement an option for zero-temperature sampling
         """
         for _ in range(max_new_tokens):
             # if the sequence context is growing too long we must crop it at block_size
             idx_cond = idx if idx.size(1) <= self.config.block_size else idx[:, -self.config.block_size:]
             # forward the model to get the logits for the index in the sequence
-            logits, _ = self(idx_cond)
+            logits = self(idx_cond)
             # pluck the logits at the final step and scale by desired temperature
             logits = logits[:, -1, :] / temperature
             # optionally crop the logits to only the top k options
@@ -397,41 +401,36 @@ class Transformer(nn.Module):
         return idx
         
         
-        
 @dataclass
 class MLPConfig:
-    block_size: int = 64
     in_dim: int = 2
     out_dim: int = 1
     width: int = 40
     depth: int = 2 # note: depth is the #(linear layers), and #(hidden layers) = #(linear layers) - 1.
+    activation = nn.SiLU
     
 class MLP(nn.Module):
-    def __init__(self, in_dim=2, out_dim=2, width=2, depth=2):
-        super(MLP, self).__init__()
-        
-        shp = [in_dim] + [width]*(depth-1) + [out_dim]
-        self.in_dim = in_dim
-        self.out_dim = out_dim
-        self.depth = depth
-
-        linear_list = []
-        for i in range(self.depth):
-            linear_list.append(nn.Linear(shp[i], shp[i+1]))
-        self.linears = nn.ModuleList(linear_list)
-        self.shp = shp
+    def __init__(self, config):
+        super().__init__()
+        shp = [config.in_dim] + [config.width]*(config.depth-1) + [config.out_dim]
+        layers = []
+        for i in range(config.depth):
+            layers.append(nn.Linear(shp[i], shp[i+1]))
+            if i < config.depth - 1:
+                layers.append(config.activation())
+        self.mlp = nn.Sequential(*layers)
     
     def forward(self, x):
-        
+        return self.mlp(x)
         # input shape = (batch_size, input_dim)
         # define activation here
         #f = lambda x: 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
-        f = torch.nn.SiLU()
-        for i in range(self.depth-1):
-            x = f(self.linears[i](x))
-        x = self.linears[-1](x)
-        # output shape = (batch_size, output_dim)
-        return x
+        # f = torch.nn.SiLU()
+        # for i in range(self.depth-1):
+        #     x = f(self.linears[i](x))
+        # x = self.linears[-1](x)
+        # # output shape = (batch_size, output_dim)
+        # return x
     
 @dataclass
 class RNNConfig:
@@ -441,14 +440,13 @@ class RNNConfig:
     
     
 class RNN(nn.Module):
-    def __init__(self, hidden_dim, input_dim=2, output_dim=1, device='cpu'):
-        super(RNN, self).__init__()
-
-        # Defining some parameters
-        self.hidden_dim = hidden_dim
-        self.Wh = nn.Linear(hidden_dim, hidden_dim)
-        self.Wx = nn.Linear(input_dim, hidden_dim)
-        self.Wy = nn.Linear(hidden_dim, output_dim)
+    def __init__(self, config, device='cpu'):
+        super().__init__()
+        self.config = config
+        self.hidden_dim = config.hidden_dim
+        self.Wh = nn.Linear(config.hidden_dim, config.hidden_dim)
+        self.Wx = nn.Linear(config.input_dim, config.hidden_dim)
+        self.Wy = nn.Linear(config.hidden_dim, config.output_dim)
         self.act = nn.Sigmoid()
         #self.act = lambda x: x
         self.device = device
