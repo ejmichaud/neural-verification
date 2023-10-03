@@ -63,10 +63,8 @@ def expand_to_shape(weights, biases, shp):
 
 # Load the weights and biases from fname
 original_weights = torch.load(fname, map_location=torch.device('cpu'))
-#key1_key2_pairs = [('mlp.0.weight', 'linears.0.weight'), ('mlp.0.bias', 'linears.0.bias'), ('mlp.2.weight', 'linears.1.weight'), ('mlp.2.bias', 'linears.1.bias')]
-#original_weights = {key2:original_weights[key1] for (key1, key2) in key1_key2_pairs}
 prefix = 'linears.'
-original_shape = [original_weights[prefix + '0.bias'].shape[0]] + [original_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
+original_shape = [original_weights[prefix + '0.weight'].shape[1]] + [original_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
 weights = [original_weights[prefix + str(i) + '.weight'].numpy() for i in range(int(len(original_weights)//2))]
 biases = [original_weights[prefix + str(i) + '.bias'].numpy() for i in range(int(len(original_weights)//2))]
 
@@ -75,14 +73,7 @@ neurons_to_prune = figure_out_which_neurons_to_prune(weights)
 
 # Prune dead neurons
 prune_neurons(weights, biases, neurons_to_prune)
-
-# Fill the dead neurons with zeroed out neurons
-expand_to_shape(weights, biases, original_shape)
-
-# Count the neurons which have been pruned and how many remain
-n_pruned_neurons = sum([sum(list(map(int, layer))) for layer in neurons_to_prune])
-new_shape = [original_shape[0]] + [sum([1-int(x) for x in layer]) for layer in neurons_to_prune] + [original_shape[-1]]
-n_unpruned_neurons = sum(new_shape[1:-1])
+new_shape = [weights[0].shape[1]] + [weight.shape[0] for weight in weights]
 
 # Put the new weights and biases into a data structure that can be loaded into a pytorch model
 weights = {prefix+str(i)+'.weight':torch.from_numpy(weights[i]) for i in range(len(weights))}
@@ -90,13 +81,14 @@ biases = {prefix+str(i)+'.bias':torch.from_numpy(biases[i]) for i in range(len(b
 new_weights = {**weights, **biases}
 
 # Put the new weights and biases into modified_model.pt
-depth=int(len(new_weights)//2)
-width=new_weights[prefix + '0.weight'].shape[0]
-in_dim=new_weights[prefix + '0.weight'].shape[1]
-out_dim=new_weights[prefix +  str(depth-1) + '.weight'].shape[0]
+depth = len(new_shape)-1
+width = max(new_shape[1:-1])
+in_dim = new_shape[0]
+out_dim = new_shape[-1]
 model = MLP(in_dim=in_dim, out_dim=out_dim, width=width, depth=depth)
+model.linears = nn.ModuleList([nn.Linear(new_shape[i], new_shape[i+1]) for i in range(depth)])
+model.shp = new_shape
 model.load_state_dict(new_weights)
-model.shp = [new_weights[prefix + '0.bias'].shape[0]] + [new_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(new_weights)//2))]
 torch.save(model.state_dict(), modified_fname)
 
-print(str(n_pruned_neurons) + ' hidden neurons pruned, ' + str(n_unpruned_neurons) + ' hidden neurons left. Original shape: ' + str(original_shape) + '. New shape: ' + str(new_shape))
+print('Original shape: ' + str(original_shape) + '. New shape: ' + str(new_shape))

@@ -42,18 +42,16 @@ def try_to_combine_neurons(weights, biases):
                     avg_weight = (in_weights_1 + in_weights_2) / 2
                     avg_bias = (biases[layer][neuron_num_1] + biases[layer][neuron_num_2]) / 2
                     total_output = out_weights_1 + out_weights_2
-                    weights[layer] = np.concatenate([avg_weight[np.newaxis,:], weights[layer][:neuron_num_1,:], weights[layer][neuron_num_1+1:neuron_num_2,:], weights[layer][neuron_num_2+1:,:], np.zeros([1, weights[layer].shape[1]])], axis=0)
-                    weights[layer+1] = np.concatenate([total_output[:,np.newaxis], weights[layer+1][:,:neuron_num_1], weights[layer+1][:,neuron_num_1+1:neuron_num_2], weights[layer+1][:,neuron_num_2+1:], np.zeros([weights[layer+1].shape[0], 1])], axis=1)
-                    biases[layer] = np.concatenate([np.array([avg_bias]), biases[layer][:neuron_num_1], biases[layer][neuron_num_1+1:neuron_num_2], biases[layer][neuron_num_2+1:], np.array([0])], axis=0)
+                    weights[layer] = np.concatenate([avg_weight[np.newaxis,:], weights[layer][:neuron_num_1,:], weights[layer][neuron_num_1+1:neuron_num_2,:], weights[layer][neuron_num_2+1:,:]], axis=0)
+                    weights[layer+1] = np.concatenate([total_output[:,np.newaxis], weights[layer+1][:,:neuron_num_1], weights[layer+1][:,neuron_num_1+1:neuron_num_2], weights[layer+1][:,neuron_num_2+1:]], axis=1)
+                    biases[layer] = np.concatenate([np.array([avg_bias]), biases[layer][:neuron_num_1], biases[layer][neuron_num_1+1:neuron_num_2], biases[layer][neuron_num_2+1:]], axis=0)
                     return (layer, neuron_num_1, neuron_num_2, norm)  # Return some information about which neurons were combined
     return False
 
 # Load the weights and biases from sample_model.pt
 original_weights = torch.load(fname, map_location=torch.device('cpu'))
-#key1_key2_pairs = [('mlp.0.weight', 'linears.0.weight'), ('mlp.0.bias', 'linears.0.bias'), ('mlp.2.weight', 'linears.1.weight'), ('mlp.2.bias', 'linears.1.bias')]
-#original_weights = {key2:original_weights[key1] for (key1, key2) in key1_key2_pairs}
 prefix = 'linears.'
-original_shape = [original_weights[prefix + '0.bias'].shape[0]] + [original_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
+original_shape = [original_weights[prefix + '0.weight'].shape[1]] + [original_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
 weights = [original_weights[prefix + str(i) + '.weight'].numpy() for i in range(int(len(original_weights)//2))]
 biases = [original_weights[prefix + str(i) + '.bias'].numpy() for i in range(int(len(original_weights)//2))]
 
@@ -66,6 +64,7 @@ while neuron_successfully_removed:
         print('Neurons ' + str(neuron_1) + ' and ' + str(neuron_2) + ' of layer ' + str(layer) + ' have been combined. Norm: ' + str(norm))
     else:
         print('No removable duplicate neuron found.')
+new_shape = [weights[0].shape[1]] + [weight.shape[0] for weight in weights]
 
 # Put the new weights and biases into a data structure that can be loaded into a pytorch model
 weights = {prefix+str(i)+'.weight':torch.from_numpy(weights[i]) for i in range(len(weights))}
@@ -73,11 +72,12 @@ biases = {prefix+str(i)+'.bias':torch.from_numpy(biases[i]) for i in range(len(b
 new_weights = {**weights, **biases}
 
 # Put the new weights and biases into modified_model.pt
-depth=int(len(new_weights)//2)
-in_dim=new_weights[prefix + '0.weight'].shape[1]
-out_dim=new_weights[prefix + str(depth-1) + '.weight'].shape[0]
-width=new_weights[prefix + '0.weight'].shape[0]
+depth = len(new_shape)-1
+width = max(new_shape[1:-1])
+in_dim = new_shape[0]
+out_dim = new_shape[-1]
 model = MLP(in_dim=in_dim, out_dim=out_dim, width=width, depth=depth)
+model.linears = nn.ModuleList([nn.Linear(new_shape[i], new_shape[i+1]) for i in range(depth)])
+model.shp = new_shape
 model.load_state_dict(new_weights)
-model.shp = [new_weights[prefix + '0.bias'].shape[0]] + [new_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(new_weights)//2))]
 torch.save(model.state_dict(), modified_fname)

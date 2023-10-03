@@ -23,19 +23,17 @@ def normalize_weights(weights, biases):
 
     weights: a length N list of [out_dim, in_dim] weight tensors for the MLP.
     """
-    for layer, (in_weights, out_weights, bias) in enumerate(zip(weights[:-1], weights[1:], biases[:-1])):
-        magnitudes = np.sqrt(np.sum(in_weights**2, axis=1))
-        weights[layer] = in_weights / magnitudes[:,np.newaxis]
-        biases[layer] = bias / magnitudes
-        weights[layer+1] = out_weights * magnitudes
+    for layer in range(len(weights)-1):
+        magnitudes = np.sqrt(np.mean(weights[layer]**2, axis=1))
+        weights[layer] = weights[layer] / magnitudes[:,np.newaxis]
+        biases[layer] = biases[layer] / magnitudes
+        weights[layer+1] = weights[layer+1] * magnitudes
 
 
 # Load the weights and biases from fname
 original_weights = torch.load(fname, map_location=torch.device('cpu'))
-#key1_key2_pairs = [('mlp.0.weight', 'linears.0.weight'), ('mlp.0.bias', 'linears.0.bias'), ('mlp.2.weight', 'linears.1.weight'), ('mlp.2.bias', 'linears.1.bias')]
-#original_weights = {key2:original_weights[key1] for (key1, key2) in key1_key2_pairs}
 prefix = 'linears.'
-original_shape = [original_weights[prefix + '0.bias'].shape[0]] + [original_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
+original_shape = [original_weights[prefix + '0.weight'].shape[1]] + [original_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
 weights = [original_weights[prefix + str(i) + '.weight'].numpy() for i in range(int(len(original_weights)//2))]
 biases = [original_weights[prefix + str(i) + '.bias'].numpy() for i in range(int(len(original_weights)//2))]
 

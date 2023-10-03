@@ -14,11 +14,13 @@ parser.add_argument('fname', type=str, help='The name of the model file')
 parser.add_argument('modified_fname', type=str, help='The name of the new model file to be made')
 parser.add_argument('-n', '--n_epochs', type=int, help='Number of epochs of SGD to retrain', default=10000)
 parser.add_argument('-l', '--learning_rate', type=float, help='Learning rate for retraining', default=0.001)
+parser.add_argument('-r', '--regularization', type=float, help='L1 regularization strength', default=0.001)
 args = parser.parse_args()
 fname = args.fname
 modified_fname = args.modified_fname
 n_epochs = args.n_epochs
 learning_rate = args.learning_rate
+regularization = args.regularization
 
 
 N = 10000 # number of samples
@@ -61,7 +63,7 @@ for epoch in range(n_epochs):
     for X_batch, y_batch in dataloader:
         optimizer.zero_grad()
         y_pred = model(X_batch)
-        loss = loss_fn(y_pred, y_batch)
+        loss = loss_fn(y_pred, y_batch) + regularization * sum([torch.norm(param, p=1) for param in model.parameters()])
         loss.backward()
         optimizer.step()
 
@@ -70,8 +72,4 @@ for epoch in range(n_epochs):
     y_pred = model(X)
     epochloss = loss_fn(y_pred, y)
     training_loss.append(epochloss.item())
-#plt.plot(training_loss, label=f'train_loss (d = {width})')
-#plt.yscale("log")
-#plt.legend(loc='lower left')
-#plt.savefig(fname[:-3] + '_retrained.pdf')
 torch.save(model.state_dict(), modified_fname)

@@ -22,6 +22,7 @@ class EvolutionTree():
         self.parents = dict()
         self.roots = set()
         self.nodes = set()
+        self.metrics = dict()
     
     def init_from_raw_models(self):
         file_list = os.listdir(self.raw_models_path)
@@ -66,14 +67,15 @@ class EvolutionTree():
                 self.children[file_name] = set()
             self.parents[file_name] = None
             self.nodes.add(file_name)
+            self.metrics[file_name] = self.evaluate_metrics(file_name)
 
     def save_tree(self, tree_fname):
         with open(tree_fname, 'wb') as f:
-            pickle.dump([self.roots, self.nodes, self.children, self.parents], f)
+            pickle.dump([self.roots, self.nodes, self.children, self.parents, self.metrics], f)
 
     def load_tree(self, tree_fname):
         with open(tree_fname, 'rb') as f:
-            self.roots, self.nodes, self.children, self.parents = pickle.load(f)
+            self.roots, self.nodes, self.children, self.parents, self.metrics = pickle.load(f)
 
     def infer_tree(self):
         file_list = os.listdir(self.processed_models_path)
@@ -96,16 +98,18 @@ class EvolutionTree():
                 self.parents[file_name] = None
                 self.roots.add(file_name)
         self.nodes = set(self.nodes_list)
+        self.metrics = {node: self.evaluate_metrics(node) for node in self.nodes}
 
     def log_tree(self, log_fname):
         s = ""
         def log_tree_helper(prefix, struct, prefix_to_cut):
             if prefix_to_cut == 0:
-                s = prefix + struct[prefix_to_cut:] + "\n"
+                s = prefix + struct[prefix_to_cut:]
             else:
-                s = prefix + struct[prefix_to_cut:-3] + "\n"
+                s = prefix + struct[prefix_to_cut:-3]
+            s = s + " "*(60-len(s)) + "".join([metric_name + ":" + str(metric_value) + " "*(24-len(str(metric_value))) for metric_name, metric_value in self.metrics[struct].items()]) + "\n"
             for child in sorted(self.children[struct]):
-                s = s + log_tree_helper(prefix + "\t", child, len(struct)-2)
+                s = s + log_tree_helper(prefix + "  ", child, len(struct)-2)
             return s
 
         for root in self.roots:
@@ -123,6 +127,21 @@ class EvolutionTree():
         self.children[shortened_new_model] = set()
         self.parents[shortened_new_model] = shortened_model
         self.nodes.add(shortened_new_model)
+        self.metrics[shortened_new_model] = self.evaluate_metrics(shortened_new_model)
+
+    def evaluate_metrics(self, model):
+        results = {}
+        for metric_file, (metric_name, search_word) in metric_names.items():
+            arguments = ["python", metric_file, processed_models_path + model]
+            print(arguments)
+            result = subprocess.run(arguments, capture_output=True, text=True)
+            stdout = result.stdout
+            stderr = result.stderr
+            print(stdout)
+            metric_value = float(stdout[stdout.find(search_word)+len(search_word):])
+            results[metric_name] = metric_value
+        return results
+            
 
 
 simplifiers_information = {
@@ -131,6 +150,7 @@ simplifiers_information = {
         "normalizers/normalize_weights_mlp.py": (),
         "normalizers/retrain_mlp.py": ("-n", "-l"),
         "normalizers/sort_neurons_mlp.py": (),
+        "normalizers/L1_retrain_mlp.py": ("-n", "-l", "-r"),
 }
 simplifier_short_names = {
         "normalizers/combine_duplicate_neurons_mlp.py": "deduplicate",
@@ -138,6 +158,14 @@ simplifier_short_names = {
         "normalizers/normalize_weights_mlp.py": "normalize",
         "normalizers/retrain_mlp.py": "retrain",
         "normalizers/sort_neurons_mlp.py": "sort",
+        "normalizers/L1_retrain_mlp.py": "L1",
+}
+
+metric_names = {
+        "metrics/loss_mlp.py": ("loss", "Loss: "),
+        "metrics/weight_norm_mlp.py": ("norm", "Norm: "),
+        "metrics/neuron_count_mlp.py": ("neurons", "Neurons: "),
+        "metrics/sparsity_mlp.py": ("weights", "Weights: "),
 }
 
 
