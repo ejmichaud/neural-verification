@@ -31,7 +31,7 @@ def int_to_binary_str(x: int, n_bits: int):
 def create_dataset_entry(n_bits: int):
     x = np.random.randint(0, 2**16)
     y = int_to_binary_str(x, n_bits)
-    print(x, y)
+    # print(x, y)
     return x, y
 
 if __name__ == "__main__":
