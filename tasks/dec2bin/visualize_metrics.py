@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 # Load your metrics.pt
-metrics = torch.load('metrics.pt')
+metrics = torch.load('dec2bin_metrics.pt')
 
 def moving_average(data, window_size):
     return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
@@ -32,8 +32,8 @@ fig, axes = plt.subplots(1, 2, figsize=(15, 6))
 
 # Plot losses
 axes[0].set_title('Losses')
-axes[0].set_ylim(0, 0.05)
-axes[0].set_ylabel('Loss (Weighted BCE))')
+#axes[0].set_ylim(0, 1)
+axes[0].set_ylabel('Loss (BCE))')
 axes[0].set_xlabel('Steps')
 axes[0].plot(train_losses_smooth, label='Train Loss')
 axes[0].plot(test_losses_interp, label='Test Loss')
