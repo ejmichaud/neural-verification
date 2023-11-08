@@ -30,6 +30,7 @@ if __name__ == '__main__':
     parser.add_argument('--activation', type=str, default="ReLU", help='Activation function')
     parser.add_argument('--steps', type=int, default=1500, help='Number of steps for training')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
+    parser.add_argument("--weight_decay", type=float, default=0.0, help="Weight decay")
     parser.add_argument('--train_batch_size', type=int, default=1024, help='Batch size for training')
     parser.add_argument('--test_batch_size', type=int, default=8192, help='Batch size for testing')
     parser.add_argument('--progress_bar', type=bool, default=True, help='Show progress bar')
@@ -73,7 +74,7 @@ if __name__ == '__main__':
     test_loader = FastTensorDataLoader(sequences_x_test, sequences_y_test, batch_size=args.test_batch_size, shuffle=True)
     test_loader = cycle(test_loader)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     os.makedirs(args.save_dir, exist_ok=True)
 
@@ -91,7 +92,8 @@ if __name__ == '__main__':
                 x, y_target = next(test_loader)
                 x, y_target = x.unsqueeze(2), y_target.unsqueeze(2)
                 y_pred, _ = model.forward_sequence(x.to(dtype))
-                loss = F.mse_loss(y_pred, y_target.to(dtype))
+                loss = torch.mean(0.5 * torch.log(1 + (y_pred - y_target.to(dtype))**2))
+                # loss = F.mse_loss(y_pred, y_target.to(dtype))
                 test_losses.append(loss.item())
                 accuracy = (torch.round(y_pred) == y_target).float().mean()
                 test_accuracies.append(accuracy.item())
@@ -103,7 +105,8 @@ if __name__ == '__main__':
         x, y_target = next(train_loader)
         x, y_target = x.unsqueeze(2), y_target.unsqueeze(2)
         y_pred, _ = model.forward_sequence(x.to(dtype))
-        loss = F.mse_loss(y_pred, y_target.to(dtype))
+        loss = torch.mean(0.5 * torch.log(1 + (y_pred - y_target.to(dtype))**2))
+        # loss = F.mse_loss(y_pred, y_target.to(dtype))
         train_losses.append(loss.item())
         accuracy = (torch.round(y_pred) == y_target).float().mean()
         train_accuracies.append(accuracy.item())

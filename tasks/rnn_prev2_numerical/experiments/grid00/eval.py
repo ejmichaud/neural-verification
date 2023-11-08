@@ -8,8 +8,8 @@ import sys
 
 import numpy as np
 
-hidden_dims = [5, 10, 20, 30, 40, 50, 100, 200]
-seeds = list(range(5))
+hidden_dims = [1, 2, 3, 4]
+seeds = list(range(10))
 configs = list(product(hidden_dims, seeds)) # 40
 # print(len(configs))
 # exit()
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     task_idx = int(sys.argv[1])
     hidden_dim, seed = configs[task_idx]
     # run a command from the commandline with the os package
-    os.system(f"""python /om2/user/ericjm/neural-verification/tasks/rnn_prev2_discrete/experiments/grid00/train.py \
+    os.system(f"""python /om2/user/ericjm/neural-verification/tasks/rnn_prev2_numerical/experiments/grid00/train.py \
                     --seed {seed} \
                     --steps 10000 \
                     --train_batch_size 4096 \
