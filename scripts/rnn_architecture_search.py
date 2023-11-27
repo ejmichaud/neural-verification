@@ -220,7 +220,7 @@ if __name__ == '__main__':
     while n <= N * 2 and not success_seed:
         if equivalent(n, prev_n, ranges):
             prev_n = n
-            n *= 2
+            n = int(n * (2**0.25))
             continue
         seeds = list(range(args.seeds_per_run))
         args_run = argparse.Namespace(**vars(args).copy())
@@ -259,7 +259,7 @@ if __name__ == '__main__':
                 
         if success_seed is None:
             prev_n = n
-            n *= 2
+            n = int(n * (2**0.25))
             sys.stdout.write(RED+"  failed\n"+DEFAULT)
         else:
             break
