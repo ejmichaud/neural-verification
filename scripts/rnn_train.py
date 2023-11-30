@@ -24,6 +24,7 @@ import os
 import random
 import argparse
 import json
+import yaml
 
 import numpy as np
 import pandas as pd
@@ -197,6 +198,8 @@ def train(args):
     torch.save(vars(args), os.path.join(args.save_dir, "args.pt"))
     with open(os.path.join(args.save_dir, "args.json"), "w") as f:
         json.dump(vars(args), f) # also save as json for easier reading
+    with open(os.path.join(args.save_dir, "args.yaml"), "w") as f:
+        yaml.dump(vars(args), f)
 
 
 if __name__ == '__main__':

@@ -77,6 +77,7 @@ import sys
 import time
 import random
 import argparse
+import yaml
 
 import numpy as np
 import pandas as pd
@@ -172,7 +173,7 @@ if __name__ == '__main__':
     parser.add_argument('--dtype', type=str, default="float32", help='Pytorch default dtype')
     # parser.add_argument('--slurm', action="store_true", help="Enable parallel training with slurm")
     # parser.add_argument('--max_simultaneous_runs', type=int, default=10, help="Max number of slurm jobs to run at once")
-    parser.add_argument('--seeds-per-run', type=int, default=3, help="Number of seeds per run")
+    parser.add_argument('--seeds_per_run', type=int, default=3, help="Number of seeds per run")
     parser.add_argument('--save_dir', type=str, default="0", help='Directory to save results')
     # parser.add_argument('--verbose', action="store_true", help='Show progress bar during training')
     args = parser.parse_args()
@@ -332,8 +333,12 @@ if __name__ == '__main__':
     print(f"Found smallest network that works: {success_n}")
     print(f"Seed: {success_seed}")
     print(f"Parameters: {int_to_tuple(success_n, ranges)}")
+    
     # save the final run args
     torch.save(success_run_args, os.path.join(args.save_dir, "smallest_run_args.pt"))
+    with open(os.path.join(args.save_dir, "smallest_run_args.yaml"), 'w') as f:
+        yaml.dump(vars(success_run_args), f)
+    
     # also save the run records
     df = pd.DataFrame(RUN_RECORDS, columns=["args", "outcome"])
     df.to_csv(os.path.join(args.save_dir, "run_records.csv"))
