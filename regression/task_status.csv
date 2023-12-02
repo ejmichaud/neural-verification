@@ -1,0 +1,14 @@
+Task,Q1,Q2
+rnn_identity_numerical,13.758556365966797,6.6772922764357645e-06
+rnn_prev1_numerical,20.53986549377441,0.0003659408248495
+rnn_prev2_numerical,29.524642944335938,0.0066344430670142
+rnn_prev3_numerical,,
+rnn_prev4_numerical,,
+rnn_sum_numerical,,
+rnn_sum_last2_numerical,37.36280059814453,2.6089428502018563e-05
+rnn_sum_last3_numerical,38.80963897705078,0.0013763204915449023
+rnn_sum_last4_numerical,,
+rnn_or_last2_numerical,,
+rnn_parity_last2_numerical,,
+rnn_parity_last3_numerical,,
+rnn_parity_last4_numerical,,
