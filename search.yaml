@@ -53,4 +53,56 @@ rnn_prev1_numerical:
         test_batch_size: 65536
         seeds_per_run: 5
 
+rnn_unique2_numerical: 
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        max_hidden_dim: 128
+        max_hidden_mlp_depth: 3
+        max_hidden_mlp_width: 256
+        max_output_mlp_depth: 3
+        max_output_mlp_width: 256
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
 
+rnn_unique3_numerical: 
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        max_hidden_dim: 128
+        max_hidden_mlp_depth: 3
+        max_hidden_mlp_width: 256
+        max_output_mlp_depth: 3
+        max_output_mlp_width: 256
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_first_appearing_index_numerical: 
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 10
+        output_dim: 10
+        max_hidden_dim: 128
+        max_hidden_mlp_depth: 3
+        max_hidden_mlp_width: 256
+        max_output_mlp_depth: 3
+        max_output_mlp_width: 256
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
