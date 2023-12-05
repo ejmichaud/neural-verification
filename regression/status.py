@@ -13,7 +13,6 @@ tasks = [
     "rnn_sum_last2_numerical",
     "rnn_sum_last3_numerical",
     "rnn_sum_last4_numerical",
-    "rnn_or_last2_numerical",
     "rnn_parity_last2_numerical",
     "rnn_parity_last3_numerical",
     "rnn_parity_last4_numerical",
@@ -25,7 +24,8 @@ def run_task(task_name):
     try:
         # Run the task
         result = subprocess.run(["python", "auto_encode_RNN.py", "--task", task_name, "--device", "cpu"], capture_output=True, text=True)
-        print(result)
+        print("STDOUT:", result.stdout)
+        print("STDERR:", result.stderr)
     except Exception as e:
         print(f"Error running task {task_name}: {e}")
         return False

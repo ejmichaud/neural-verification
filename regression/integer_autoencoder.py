@@ -276,9 +276,8 @@ if __name__ == "__main__":
 
     dls = []
     for i in range(100):
-        try:
-            A, b, Z = GCDautoencode(hidden, thres=hyperparams[i][0], fraction=hyperparams[i][1])
-            dls.append(description_length(hidden, A, b, Z))
+        A, b, Z = GCDautoencode(hidden, thres=hyperparams[i][0], fraction=hyperparams[i][1])
+        dls.append(description_length(hidden, A, b, Z))
 
 
     optimal_hp = hyperparams[np.argmin(dls)]

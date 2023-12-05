@@ -79,14 +79,23 @@ F, T = np.meshgrid(fractions, thresholds)
 hyperparams = np.transpose(np.array([F.reshape(-1), T.reshape(-1)]))
 min_dl = float('inf')
 optimal_hp = None
+gcd_success = False
 
 for hp in hyperparams:
-    A_gcd, b_gcd, Z_gcd = GCDautoencode(hidden, thres=hp[0], fraction=hp[1])
-    dl, _ = integer_autoencoder_quality(hidden, A_gcd, b_gcd, Z_gcd)
-    if dl < min_dl:
-        min_dl = dl
-        optimal_hp = hp
+    try:
+        A_gcd, b_gcd, Z_gcd = GCDautoencode(hidden, thres=hp[0], fraction=hp[1])
+        dl, _ = integer_autoencoder_quality(hidden, A_gcd, b_gcd, Z_gcd)
+        if dl < min_dl:
+            min_dl = dl
+            optimal_hp = hp
+            gcd_success = True
+    except Exception as e:
+        last_error_message = str(e)
 
+if not gcd_success:
+    print(f"GCD Failed for {task}")
+    print(last_error_message)
+    
 # Evaluate the optimal GCDautoencode
 A_gcd, b_gcd, Z_gcd = GCDautoencode(hidden, thres=optimal_hp[0], fraction=optimal_hp[1])
 Q1_gcd, Q2_gcd = integer_autoencoder_quality(hidden, A_gcd, b_gcd, Z_gcd)
