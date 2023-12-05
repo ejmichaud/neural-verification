@@ -215,6 +215,7 @@ if __name__ == '__main__':
     prev_n = -1
     success_n = N
     success_seed = None
+    success_run_args = None
     rounds = 0
 
     # do initial run until n = N or we find a network that works
@@ -248,6 +249,7 @@ if __name__ == '__main__':
             if max(metrics['test_accuracies']) == 1.0:
                 success_n = n
                 success_seed = seed
+                success_run_args = args_run
                 RUN_RECORDS.append((vars(args_run), "succeeded"))
                 sys.stdout.write(GREEN+"."+DEFAULT)
                 sys.stdout.write(GREEN+"  succeeded\n"+DEFAULT)
@@ -275,7 +277,6 @@ if __name__ == '__main__':
     # now do a binary search between success_n and n // 2
     prev_n = success_n
     failed_n = n // 2
-    success_run_args = None
     while success_n - failed_n > 1:
         n = (success_n + failed_n) // 2
         seeds = list(range(args.seeds_per_run))

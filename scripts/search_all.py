@@ -114,24 +114,18 @@ if __name__ == '__main__':
         print(f"Submitted job for task {task} with ID: {job_id}")
 
     while True:
-        time.sleep(5)
-        n_started = 0
-        n_errored = 0
-        n_finished = 0
+        time.sleep(30)
+        statuses = {}
         # simply check the status of each job by looking at the status.txt file
         for task, job_id in job_ids.items():
             if os.path.exists(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'status.txt')):
                 with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'status.txt'), 'r') as f:
                     status = f.read().strip()
-                if status == 'finished':
-                    n_finished += 1
-                elif status == 'errored':
-                    n_errored += 1
-                elif status == 'started':
-                    n_started += 1
-                else:
-                    print(f"ERROR: status.txt file for task {task} has unexpected contents: {status}")
-        print(f"Started {max(n_started, n_finished)}/{len(job_ids)} jobs and finished {n_finished}/{len(job_ids)} jobs.")
+                if status != statuses.get(task, None):
+                    print(f"Task {task} has updated status: {status}")
+                statuses[task] = status
+        n_finished = sum([1 for status in statuses.values() if status == 'finished'])
+        n_errored = sum([1 for status in statuses.values() if status == 'errored'])
         if n_finished + n_errored == len(job_ids):
             print(f"Exiting. Finished {n_finished} and errored {n_errored} jobs.")
             break
