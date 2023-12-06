@@ -12,6 +12,11 @@ parser.add_argument('--task', type=str, default='rnn_identity_numerical', help='
 args = parser.parse_args()
 task = args.task
 
+
+def write_to_file(filename, content):
+    with open(filename, 'w') as file:
+        file.write(content)
+
 def read_pt_file(filepath):
     # Assuming the .pt file contains data in a PyTorch tensor format
     data = torch.load(filepath)
@@ -19,29 +24,29 @@ def read_pt_file(filepath):
 
 def format_prompt_for_formula(data):
     train_data = data[0][:10].tolist()  # Assuming this is a list of lists
-    labels = data[1][:10].tolist()   # Assuming this is a list of lists
+    labels = data[1][:10].tolist()  # Assuming this is a list of lists
     prompt = "Each row in the table below contains two lists.\n"
-    prompt += "Please give me a formula for how to compute y as a function of element in x.\n"
-    prompt += "list x        list y\n"
-    prompt += "----------------------------\n"
+    prompt += "Please give me a formula for how to compute y as a function of elements in x.\n"
+    prompt += "list x                       list y\n"
+    prompt += "--------------------------------------------------------\n"
     
     for xy, z in zip(train_data, labels):
         xy_str = ",".join(map(str, xy))
         z_str = ",".join(map(str, z))
-        prompt += f"{xy_str}       {z_str}\n"
+        prompt += f"{xy_str:<30} {z_str}\n"
     return prompt
 
 def format_prompt_for_code(data):
-    train_data = data[0][:10].tolist()   # Assuming this is a list of lists
-    labels = data[1][:10].tolist()   # Assuming this is a list of lists
+    train_data = data[0][:10].tolist()  # Assuming this is a list of lists
+    labels = data[1][:10].tolist()  # Assuming this is a list of lists
     prompt = "Each row in the table below contains two lists.\n"
-    prompt += "Please write a Python program that computes the list b from the list a.\n\n"
-    prompt += "list x          list y\n"
-    prompt += "----------------------------\n"
+    prompt += "Please write a Python program that computes the list y from the list x.\n\n"
+    prompt += "list x                       list y\n"
+    prompt += "--------------------------------------------------------\n"
     for a, b in zip(train_data, labels):
         a_str = ",".join(map(str, a))
         b_str = ",".join(map(str, b))
-        prompt += f"{a_str}       {b_str}\n"
+        prompt += f"{a_str:<30} {b_str}\n"
     return prompt
 
 def query_gpt(prompt, api_key):
@@ -68,9 +73,20 @@ output_file_code = "output_code.txt"
 
 data = read_pt_file(file_path)
 prompt_formula = format_prompt_for_formula(data)
-print(prompt_formula)
+# print(prompt_formula)
+
+
+##TEMP SAVE--------------->|
+write_to_file(output_file_formula, prompt_formula)
+##TEMP SAVE--------------->|
+
 prompt_code = format_prompt_for_code(data)
-print(prompt_code)
+
+##TEMP SAVE--------------->|
+write_to_file(task, prompt_formula+prompt_code)
+##TEMP SAVE--------------->|
+print(prompt_formula+prompt_code)
+
 # response_formula = query_gpt(prompt_formula, api_key)
 # response_code = query_gpt(prompt_code, api_key)
 
