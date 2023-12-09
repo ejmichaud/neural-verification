@@ -76,6 +76,10 @@ if __name__ == '__main__':
     with open(args.config, 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
     
+    # save a copy of the config in the search directory
+    with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, 'search.yaml'), 'w') as f:
+        yaml.dump(config, f)
+    
     job_ids = {}
 
     for task, task_config in config.items():
@@ -131,53 +135,53 @@ if __name__ == '__main__':
             break
 
     # parse the results of the slurm jobs and save them to a csv
-    results = []
-    for task, job_id in job_ids.items():
-        if os.path.exists(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml')):
-            with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml'), 'r') as f:
-                best_args = yaml.load(f, Loader=yaml.FullLoader)
-            # save the info we care about to results for later saving to csv
-            results.append(
-                (   
-                    task,
-                    "success",
-                    best_args['output_mlp_depth'],
-                    best_args['hidden_mlp_depth'],
-                    best_args['hidden_dim'],
-                    best_args['output_mlp_width'],
-                    best_args['hidden_mlp_width'],
-                    best_args['input_dim'],
-                    best_args['output_dim'],
-                    best_args['loss_fn'],
-                    best_args['vectorize_input'],
-                    best_args['save_dir']
-                )
-            )
-        else:
-            results.append((task, "failure"))
+    # results = []
+    # for task, job_id in job_ids.items():
+    #     if os.path.exists(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml')):
+    #         with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml'), 'r') as f:
+    #             best_args = yaml.load(f, Loader=yaml.FullLoader)
+    #         # save the info we care about to results for later saving to csv
+    #         results.append(
+    #             (   
+    #                 task,
+    #                 "success",
+    #                 best_args['output_mlp_depth'],
+    #                 best_args['hidden_mlp_depth'],
+    #                 best_args['hidden_dim'],
+    #                 best_args['output_mlp_width'],
+    #                 best_args['hidden_mlp_width'],
+    #                 best_args['input_dim'],
+    #                 best_args['output_dim'],
+    #                 best_args['loss_fn'],
+    #                 best_args['vectorize_input'],
+    #                 best_args['save_dir']
+    #             )
+    #         )
+    #     else:
+    #         results.append((task, "failure"))
     
-    # save these to a dedicated CSV within the SEARCH_TIMESTAMP directory
-    with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, 'results.csv'), 'w') as f:
-        f.write('task,success,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
-        for result in results:
-            f.write(','.join([str(x) for x in result]) + '\n')
+    # # save these to a dedicated CSV within the SEARCH_TIMESTAMP directory
+    # with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, 'results.csv'), 'w') as f:
+    #     f.write('task,success,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
+    #     for result in results:
+    #         f.write(','.join([str(x) for x in result]) + '\n')
  
-    # save results also to a summary csv directly in save_dir. make the first row the column names
-    # if there already exists a summary.csv, override the rows
-    # for the tasks that were just run
-    if os.path.exists(os.path.join(args.save_dir, 'summary.csv')):
-        with open(os.path.join(args.save_dir, 'summary.csv'), 'r') as f:
-            lines = f.readlines()
-        with open(os.path.join(args.save_dir, 'summary.csv'), 'w') as f:
-            f.write(lines[0])
-            for line in lines[1:]:
-                task = line.split(',')[0]
-                if task not in job_ids:
-                    f.write(line)
-            for result in results:
-                f.write(','.join([str(x) for x in result]) + '\n')
-    else:
-        with open(os.path.join(args.save_dir, 'summary.csv'), 'w') as f:
-            f.write('task,success,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
-            for result in results:
-                f.write(','.join([str(x) for x in result]) + '\n')
+    # # save results also to a summary csv directly in save_dir. make the first row the column names
+    # # if there already exists a summary.csv, override the rows
+    # # for the tasks that were just run
+    # if os.path.exists(os.path.join(args.save_dir, 'summary.csv')):
+    #     with open(os.path.join(args.save_dir, 'summary.csv'), 'r') as f:
+    #         lines = f.readlines()
+    #     with open(os.path.join(args.save_dir, 'summary.csv'), 'w') as f:
+    #         f.write(lines[0])
+    #         for line in lines[1:]:
+    #             task = line.split(',')[0]
+    #             if task not in job_ids:
+    #                 f.write(line)
+    #         for result in results:
+    #             f.write(','.join([str(x) for x in result]) + '\n')
+    # else:
+    #     with open(os.path.join(args.save_dir, 'summary.csv'), 'w') as f:
+    #         f.write('task,success,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
+    #         for result in results:
+    #             f.write(','.join([str(x) for x in result]) + '\n')

@@ -62,7 +62,7 @@ if __name__ == '__main__':
         if os.path.exists(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml')):
             with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml'), 'r') as f:
                 best_args = yaml.load(f, Loader=yaml.FullLoader)
-            if best_args is None:
+            if best_args is None: # under what circumstances is this True?
                 results.append((task, "error"))
                 continue
             # save the info we care about to results for later saving to csv
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         f.write('task,success,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
         for result in results:
             f.write(','.join([str(x) for x in result]) + '\n')
- 
+
     # save results also to a summary csv directly in save_dir. make the first row the column names
     # if there already exists a summary.csv, override the rows
     # for the tasks that were just run
