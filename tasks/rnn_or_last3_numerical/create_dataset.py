@@ -4,10 +4,11 @@
 
 This dataset is a sequence prediction task where the input is a
 sequence of 0s and 1s and the output at each sequence position
-is the parity of the current and previous two inputs. At the first
-position, the output is the XOR of the input and zero. At the second
-position the output is the parity zero, first element, and second
-element. Sequences are of length 10.
+is the logical OR of the previous 3 elements in the sequence (
+the current element and the previous two). At the first
+position, the output is the OR of the input and zero. At
+the second position, the output is the OR of the input and
+the first element. Sequences are of length 10.
 
 -------------------------------------------------------------------
 """
@@ -25,20 +26,19 @@ if __name__ == "__main__":
     np.random.seed(42)
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
-    
+
     D = int(1e6)
     split = 0.9
 
     sequences_x = torch.randint(0, 2, (D, 10), dtype=torch.int8)
     sequences_y = torch.zeros_like(sequences_x, dtype=torch.int8)
     for i in range(10):
-        sequences_y[:, i] = torch.sum(sequences_x[:, max(i-2, 0):i+1], dim=-1) % 2
-        # if i == 0:
-        #     sequences_y[:, i] = sequences_x[:, i]
-        # else:
-            # sequences_y[:, i] = sequences_x[:, i] | sequences_x[:, i-1]
-            # sequences_y[:, i] = sequences_x[:, i] ^ sequences_x[:, i-1]
-            # compute the parity of 0:i
+        if i == 0:
+            sequences_y[:, i] = sequences_x[:, i]
+        if i == 1:
+            sequences_y[:, i] = sequences_x[:, i] | sequences_x[:, i-1]
+        else:
+            sequences_y[:, i] = sequences_x[:, i] | sequences_x[:, i-1] | sequences_x[:, i-2]
 
     sequences_x_train = sequences_x[:int(D * split)]
     sequences_x_test = sequences_x[int(D * split):]

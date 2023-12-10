@@ -31,10 +31,11 @@ if __name__ == "__main__":
     sequences_x = torch.randint(0, 100, (D, 10), dtype=torch.int8)
     sequences_y = torch.zeros((D, 10), dtype=torch.int8)
     for i in tqdm(range(10)):
-        sequences_y[:, i] = sequences_x[:, max(0, i-3)]
+        sequences_y[:, i] = sequences_x[:, max(0, i-4)]
     sequences_y[:, 0] = 0
     sequences_y[:, 1] = 0
     sequences_y[:, 2] = 0
+    sequences_y[:, 3] = 0
     sequences_x_train = sequences_x[:int(D * split)]
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]

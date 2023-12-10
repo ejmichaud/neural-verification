@@ -43,4 +43,4 @@ if __name__ == "__main__":
         sequences_y_train,
         sequences_x_test, 
         sequences_y_test
-    ), "data.pt")
+    ), os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.pt"))

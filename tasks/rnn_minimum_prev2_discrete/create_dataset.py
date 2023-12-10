@@ -4,9 +4,9 @@
 
 This dataset is a sequence prediction task where the input is a
 sequence of integers and the output at each sequence position
-is the element that occurred three sequence positions earlier.
-For the first three elements we output zero. Sequences are lists 
-of integers in [0, 100) of length 10.
+is the minimum value of the current and previous sequence
+element. Sequences are lists of integers in [0, 100)
+of length 10.
 
 -------------------------------------------------------------------
 """
@@ -31,15 +31,11 @@ if __name__ == "__main__":
     sequences_x = torch.randint(0, 100, (D, 10), dtype=torch.int8)
     sequences_y = torch.zeros((D, 10), dtype=torch.int8)
     for i in tqdm(range(10)):
-        sequences_y[:, i] = sequences_x[:, max(0, i-3)]
-    sequences_y[:, 0] = 0
-    sequences_y[:, 1] = 0
-    sequences_y[:, 2] = 0
+        sequences_y[:, i] = sequences_x[:, max(i-1, 0):i+1].min(dim=1)[0]
     sequences_x_train = sequences_x[:int(D * split)]
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]
     sequences_y_test = sequences_y[int(D * split):]
-    # import code; code.interact(local=locals())
     torch.save((
         sequences_x_train, 
         sequences_y_train,
