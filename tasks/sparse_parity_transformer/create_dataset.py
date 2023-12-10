@@ -11,6 +11,7 @@ the input string by sampling each bit uniformly at random.
 -------------------------------------------------------------------
 """
 
+import os
 from math import floor, ceil
 import random
 

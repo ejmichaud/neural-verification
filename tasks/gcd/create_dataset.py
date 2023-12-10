@@ -13,6 +13,7 @@ to compute the GCD of the two integers.
 -------------------------------------------------------------------
 """
 
+import os
 from math import gcd
 import numpy as np
 import pandas as pd

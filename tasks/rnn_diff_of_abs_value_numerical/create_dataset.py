@@ -11,6 +11,7 @@ Sequences are lists of integers in [-100, 100) of length 10.
 -------------------------------------------------------------------
 """
 
+import os
 from math import floor, ceil
 import random
 import gzip

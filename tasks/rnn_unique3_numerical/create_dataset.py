@@ -13,6 +13,8 @@ of length 10.
 -------------------------------------------------------------------
 """
 
+import os
+
 from math import floor, ceil
 import random
 import gzip

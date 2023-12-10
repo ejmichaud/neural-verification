@@ -27,6 +27,7 @@ palindromes.
 -------------------------------------------------------------------
 """
 
+import os
 from math import floor, ceil
 import random
 

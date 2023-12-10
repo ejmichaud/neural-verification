@@ -10,6 +10,7 @@ The sequences are 70% random integers and 30% powers of 2.
 -------------------------------------------------------------------
 """
 
+import os
 from math import floor, ceil
 import random
 import gzip
