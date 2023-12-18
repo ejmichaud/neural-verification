@@ -8,6 +8,8 @@ is the XOR  of the current and previous input. At the first
 position, the output is the XOR of the input and zero. Sequences
 are of length 10.
 
+Author: Eric Michaud
+
 -------------------------------------------------------------------
 """
 

@@ -116,6 +116,71 @@ rnn_sum_last4_numerical:
         test_batch_size: 65536
         seeds_per_run: 5
 
+rnn_sum_last5_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_sum_last6_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_sum_last7_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_sum_last8_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_sum_last9_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
 rnn_parity_numerical:
     include: true
     args:
@@ -182,6 +247,19 @@ rnn_unique2_numerical:
         seeds_per_run: 5
 
 rnn_unique3_numerical: 
+    include: false
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_abs_max_numerical:
     include: true
     args:
         loss_fn: "log"
@@ -194,11 +272,102 @@ rnn_unique3_numerical:
         test_batch_size: 65536
         seeds_per_run: 5
 
-rnn_first_appearing_index_numerical: 
+rnn_abs_min_numerical:
     include: true
     args:
         loss_fn: "log"
         vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_abs_value_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_abs_value_of_diff_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_count_power_of_2s_bool:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 100
+        output_dim: 2
+        activation: "ReLU"
+        steps: 20000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5 
+
+rnn_count_power_of_2s_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_diff_last2_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_diff_of_abs_value_numerical:
+    include: true
+        args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5 
+
+rnn_first_appearing_index_numerical: 
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: true
         input_dim: 10
         output_dim: 10
         activation: "ReLU"
@@ -206,3 +375,43 @@ rnn_first_appearing_index_numerical:
         train_batch_size: 4096
         test_batch_size: 65536
         seeds_per_run: 5
+
+rnn_l1_norm_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_mod_eq0_last2_numerical:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 2
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_mod_last2_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+

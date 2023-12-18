@@ -9,6 +9,8 @@ position, the output is the XOR of the input and zero. At the second
 position the output is the parity zero, first element, and second
 element. Sequences are of length 10.
 
+Author: Eric Michaud
+
 -------------------------------------------------------------------
 """
 

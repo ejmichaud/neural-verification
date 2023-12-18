@@ -8,6 +8,8 @@ is absolute value of the current element minus
 absolute value of the previous value
 Sequences are lists of integers in [-100, 100) of length 10.
 
+Author: Carl Guo
+
 -------------------------------------------------------------------
 """
 
@@ -23,16 +25,19 @@ import torch
 if __name__ == "__main__":
     random.seed(42)
     np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
 
     D = int(1e6)
     split = 0.9
     powers_of_2 = [2 ** i for i in range(7)]
-    sequences_x = torch.randint(-100, 100, (D, 10), dtype=torch.int8)
+    sequences_x = torch.randint(-100, 100, (D, 10), dtype=torch.int16)
     sequences_y = torch.zeros_like(sequences_x)
+    sequences_y[:, 0] = torch.abs(sequences_x[:, 0])
     for i in range(1, 10):
         sequences_y[:, i] = torch.abs(sequences_x[:, i]) - torch.abs(sequences_x[:, i-1])
-    print(sequences_x[:5], sequences_y[:5])
-
+    # print(sequences_x[:5], sequences_y[:5])
+    # import code; code.interact(local=locals())
     sequences_x_train = sequences_x[:int(D * split)]
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]
@@ -43,3 +48,4 @@ if __name__ == "__main__":
         sequences_x_test, 
         sequences_y_test
     ), os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.pt"))
+

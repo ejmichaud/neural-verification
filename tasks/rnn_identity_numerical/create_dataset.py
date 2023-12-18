@@ -8,6 +8,8 @@ is the element that occurred at that same sequence position.
 This is is among the simplest possible RNN tasks: the identity.
 Sequences are lists of integers in [0, 100) of length 10.
 
+Author: Eric Michaud
+
 -------------------------------------------------------------------
 """
 
@@ -23,6 +25,8 @@ import torch
 if __name__ == "__main__":
     random.seed(42)
     np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
 
     D = int(1e6)
     split = 0.9

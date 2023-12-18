@@ -8,6 +8,8 @@ is the previous element in the sequence. For the first element,
 the output is zero. Sequences are lists of integers in [0, 100)
 of length 10.
 
+Author: Eric Michaud
+
 -------------------------------------------------------------------
 """
 

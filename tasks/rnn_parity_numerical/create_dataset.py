@@ -8,6 +8,8 @@ is the logical OR of the current and previous input. At the first
 position, the output is the OR of the input and zero. Sequences
 are of length 10.
 
+Author: Eric Michaud
+
 -------------------------------------------------------------------
 """
 
@@ -51,3 +53,4 @@ if __name__ == "__main__":
         sequences_x_test, 
         sequences_y_test
     ), os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.pt"))
+

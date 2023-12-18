@@ -4,8 +4,10 @@
 
 This dataset is a sequence prediction task where the input is a
 sequence of integers and the output at each sequence position
-is the max of the absolute value of all the element till that position.
+is the min of the absolute value of all the element till that position.
 Sequences are lists of integers in [-100, 100) of length 10.
+
+Author: Carl Guo
 
 -------------------------------------------------------------------
 """
@@ -22,6 +24,8 @@ import torch
 if __name__ == "__main__":
     random.seed(42)
     np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
 
     D = int(1e6)
     split = 0.9
@@ -29,7 +33,8 @@ if __name__ == "__main__":
     sequences_x = torch.randint(-100, 100, (D, 10), dtype=torch.int8)
     abs_x = torch.abs(sequences_x)
     sequences_y = torch.cummin(abs_x, dim=1)[0]
-    print(sequences_x[:5], sequences_y[:5])
+    # print(sequences_x[:5], sequences_y[:5])
+    # import code; code.interact(local=locals())
     sequences_x_train = sequences_x[:int(D * split)]
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]
