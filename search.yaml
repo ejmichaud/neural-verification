@@ -505,3 +505,16 @@ rnn_prev8_numerical:
         train_batch_size: 4096
         test_batch_size: 65536
         seeds_per_run: 5
+
+polish:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: true
+        input_dim: 14
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
