@@ -1,6 +1,6 @@
 
 rnn_identity_numerical:
-    include: true # whether to actually perform arch search on this task
+    include: false # whether to actually perform arch search on this task
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -13,7 +13,7 @@ rnn_identity_numerical:
         seeds_per_run: 5
 
 rnn_prev1_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -26,7 +26,7 @@ rnn_prev1_numerical:
         seeds_per_run: 5
 
 rnn_prev2_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -39,7 +39,7 @@ rnn_prev2_numerical:
         seeds_per_run: 5
 
 rnn_prev3_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -52,7 +52,7 @@ rnn_prev3_numerical:
         seeds_per_run: 5
 
 rnn_prev4_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -65,7 +65,7 @@ rnn_prev4_numerical:
         seeds_per_run: 5
 
 rnn_sum_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -78,7 +78,7 @@ rnn_sum_numerical:
         seeds_per_run: 5
 
 rnn_sum_last2_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -91,7 +91,7 @@ rnn_sum_last2_numerical:
         seeds_per_run: 5
 
 rnn_sum_last3_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -104,7 +104,7 @@ rnn_sum_last3_numerical:
         seeds_per_run: 5
 
 rnn_sum_last4_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -117,7 +117,7 @@ rnn_sum_last4_numerical:
         seeds_per_run: 5
 
 rnn_sum_last5_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -130,7 +130,7 @@ rnn_sum_last5_numerical:
         seeds_per_run: 5
 
 rnn_sum_last6_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -143,7 +143,7 @@ rnn_sum_last6_numerical:
         seeds_per_run: 5
 
 rnn_sum_last7_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -156,7 +156,7 @@ rnn_sum_last7_numerical:
         seeds_per_run: 5
 
 rnn_sum_last8_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -169,7 +169,7 @@ rnn_sum_last8_numerical:
         seeds_per_run: 5
 
 rnn_sum_last9_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -182,7 +182,7 @@ rnn_sum_last9_numerical:
         seeds_per_run: 5
 
 rnn_parity_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -195,7 +195,7 @@ rnn_parity_numerical:
         seeds_per_run: 5
 
 rnn_parity_last2_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -208,7 +208,7 @@ rnn_parity_last2_numerical:
         seeds_per_run: 5
 
 rnn_parity_last3_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -221,7 +221,7 @@ rnn_parity_last3_numerical:
         seeds_per_run: 5
 
 rnn_parity_last4_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -234,7 +234,7 @@ rnn_parity_last4_numerical:
         seeds_per_run: 5
 
 rnn_unique2_numerical: 
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -260,7 +260,7 @@ rnn_unique3_numerical:
         seeds_per_run: 5
 
 rnn_abs_max_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -273,7 +273,7 @@ rnn_abs_max_numerical:
         seeds_per_run: 5
 
 rnn_abs_min_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -286,7 +286,7 @@ rnn_abs_min_numerical:
         seeds_per_run: 5
 
 rnn_abs_value_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -299,7 +299,7 @@ rnn_abs_value_numerical:
         seeds_per_run: 5
 
 rnn_abs_value_of_diff_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -312,7 +312,7 @@ rnn_abs_value_of_diff_numerical:
         seeds_per_run: 5
 
 rnn_count_power_of_2s_bool:
-    include: true
+    include: false
     args:
         loss_fn: "cross_entropy"
         vectorize_input: true
@@ -325,7 +325,7 @@ rnn_count_power_of_2s_bool:
         seeds_per_run: 5 
 
 rnn_count_power_of_2s_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -338,7 +338,7 @@ rnn_count_power_of_2s_numerical:
         seeds_per_run: 5
 
 rnn_diff_last2_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -351,7 +351,7 @@ rnn_diff_last2_numerical:
         seeds_per_run: 5
 
 rnn_diff_of_abs_value_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -364,7 +364,7 @@ rnn_diff_of_abs_value_numerical:
         seeds_per_run: 5 
 
 rnn_first_appearing_index_numerical: 
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: true
@@ -377,7 +377,7 @@ rnn_first_appearing_index_numerical:
         seeds_per_run: 5
 
 rnn_l1_norm_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: false
@@ -390,7 +390,7 @@ rnn_l1_norm_numerical:
         seeds_per_run: 5
 
 rnn_mod_eq0_last2_numerical:
-    include: true
+    include: false
     args:
         loss_fn: "cross_entropy"
         vectorize_input: false
@@ -403,6 +403,97 @@ rnn_mod_eq0_last2_numerical:
         seeds_per_run: 5
 
 rnn_mod_last2_numerical:
+    include: false
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_not_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_and_last2_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_or_last2_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_prev5_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_prev6_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_prev7_numerical:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_prev8_numerical:
     include: true
     args:
         loss_fn: "log"

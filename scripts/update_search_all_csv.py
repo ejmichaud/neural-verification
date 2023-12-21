@@ -87,7 +87,7 @@ if __name__ == '__main__':
     
     # save these to a dedicated CSV within the SEARCH_TIMESTAMP directory
     with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, 'results.csv'), 'w') as f:
-        f.write('task,success,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
+        f.write('task,status,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
         for result in results:
             f.write(','.join([str(x) for x in result]) + '\n')
 

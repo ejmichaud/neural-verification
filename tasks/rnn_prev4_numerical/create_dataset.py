@@ -5,7 +5,7 @@
 This dataset is a sequence prediction task where the input is a
 sequence of integers and the output at each sequence position
 is the element that occurred four sequence positions earlier.
-For the first three elements we output zero. Sequences are lists 
+For the first four elements we output zero. Sequences are lists 
 of integers in [0, 100) of length 10.
 
 Author: Eric Michaud

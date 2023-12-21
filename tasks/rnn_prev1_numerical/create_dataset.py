@@ -42,7 +42,7 @@ if __name__ == "__main__":
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]
     sequences_y_test = sequences_y[int(D * split):]
-    import code; code.interact(local=locals())
+    # import code; code.interact(local=locals())
     torch.save((
         sequences_x_train, 
         sequences_y_train,

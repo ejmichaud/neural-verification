@@ -8,6 +8,8 @@ is the logical OR of the current and previous input. At the first
 position, the output is the OR of the input and zero. Sequences
 are of length 10.
 
+Author: Eric Michaud
+
 -------------------------------------------------------------------
 """
 
@@ -41,10 +43,11 @@ if __name__ == "__main__":
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]
     sequences_y_test = sequences_y[int(D * split):]
-    import code; code.interact(local=locals())
+    # import code; code.interact(local=locals())
     torch.save((
         sequences_x_train, 
         sequences_y_train,
         sequences_x_test, 
         sequences_y_test
     ), os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.pt"))
+

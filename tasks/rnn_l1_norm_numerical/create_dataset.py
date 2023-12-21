@@ -34,7 +34,7 @@ if __name__ == "__main__":
     cumsum_x = torch.cumsum(sequences_x, dim=1)[0]
     sequences_y = sequences_x / cumsum_x
     # print(sequences_x[:5], sequences_y[:5])
-    import code; code.interact(local=locals())
+    # import code; code.interact(local=locals())
     sequences_x_train = sequences_x[:int(D * split)]
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]
