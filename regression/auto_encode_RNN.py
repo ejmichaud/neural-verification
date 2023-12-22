@@ -68,7 +68,7 @@ def update_task_status(task_name, Q1, Q2):
 
 # Rest of your existing code...
 # LinRNNautoencode
-A_lin, b_lin, Z_lin, _ = LinRNNautoencode(hidden, hidden2, inputs_last)
+A_lin, b_lin, Z_lin, Z_lin2 = LinRNNautoencode(hidden, hidden2, inputs_last)
 Q1_lin, Q2_lin = integer_autoencoder_quality(hidden, A_lin, b_lin, Z_lin)
 
 # GCDautoencode with hyperparameter tuning
@@ -83,7 +83,7 @@ gcd_success = False
 
 for hp in hyperparams:
     try:
-        A_gcd, b_gcd, Z_gcd = GCDautoencode(hidden, thres=hp[0], fraction=hp[1])
+        A_gcd, b_gcd, Z_gcd, Z_gcd2 = GCDautoencode(hidden, hidden2, thres=hp[0], fraction=hp[1])
         dl, _ = integer_autoencoder_quality(hidden, A_gcd, b_gcd, Z_gcd)
         if dl < min_dl:
             min_dl = dl
@@ -92,43 +92,47 @@ for hp in hyperparams:
     except Exception as e:
         last_error_message = str(e)
 
+
 if not gcd_success:
     print(f"GCD Failed for {task}")
     print(last_error_message)
     
 # Evaluate the optimal GCDautoencode
-A_gcd, b_gcd, Z_gcd = GCDautoencode(hidden, thres=optimal_hp[0], fraction=optimal_hp[1])
+print(optimal_hp)
+A_gcd, b_gcd, Z_gcd, Z_gcd2 = GCDautoencode(hidden, hidden2, thres=optimal_hp[0], fraction=optimal_hp[1])
 Q1_gcd, Q2_gcd = integer_autoencoder_quality(hidden, A_gcd, b_gcd, Z_gcd)
 
-# Choose the method with the best Q2 score and update the file
-if Q2_gcd > Q2_lin:
+# Choose the method with the best Q1 score and update the file
+if Q1_gcd > Q1_lin:
     # Update file with LinRNNautoencode results
-    A_best, b_best, Z_best = A_lin, b_lin, Z_lin
+    A_best, b_best, Z_best, Z2_best = A_lin, b_lin, Z_lin, Z_lin2
     Q1_best, Q2_best = Q1_lin, Q2_lin
 else:
-        # Update file with GCDautoencode results
-    A_best, b_best, Z_best = A_gcd, b_gcd, Z_gcd
+    # Update file with GCDautoencode results
+    A_best, b_best, Z_best, Z2_best = A_gcd, b_gcd, Z_gcd, Z_gcd2
     Q1_best, Q2_best = Q1_gcd, Q2_gcd
 
 print(f"Updating Spreadsheet with {task, Q1_best, Q2_best}")
 update_task_status(task, Q1_best, Q2_best)
 
 
-def save_tensors(task, A, b, Z):
+def save_tensors(task, A, b, Z, Z2):
     os.makedirs(f"./tasks/{task}", exist_ok=True)
     torch.save(A, f"./tasks/{task}/A_best.pt")
     torch.save(b, f"./tasks/{task}/b_best.pt")
     torch.save(Z, f"./tasks/{task}/Z_best.pt")
+    torch.save(Z2, f"./tasks/{task}/Z2_best.pt")
 
 # Function to save tensors in a CSV file
-def save_to_csv(task, A, b, Z):
+def save_to_csv(task, A, b, Z, Z2):
     A_df = pd.DataFrame(A)
     b_df = pd.DataFrame(b)
     Z_df = pd.DataFrame(Z)
-    combined_df = pd.concat([A_df, b_df, Z_df], axis=1)
-    combined_df.columns = [f"A{i}" for i in range(A_df.shape[1])] + [f"b{i}" for i in range(b_df.shape[1])] + [f"Z{i}" for i in range(Z_df.shape[1])]
+    Z2_df = pd.DataFrame(Z2)
+    combined_df = pd.concat([A_df, b_df, Z_df, Z2_df], axis=1)
+    combined_df.columns = [f"A_{i}" for i in range(A_df.shape[1])] + [f"b_{i}" for i in range(b_df.shape[1])] + [f"Z_{i}" for i in range(Z_df.shape[1])] + [f"Z2_{i}" for i in range(Z_df.shape[1])]
     combined_df.to_csv(f"./tasks/{task}/tensors.csv", index=False)
 
 # Save the best tensors as .pt files and in a CSV file
-save_tensors(task, A_best, b_best, Z_best)
-save_to_csv(task, A_best, b_best, Z_best)
+save_tensors(task, A_best, b_best, Z_best, Z2_best)
+save_to_csv(task, A_best, b_best, Z_best, Z2_best)

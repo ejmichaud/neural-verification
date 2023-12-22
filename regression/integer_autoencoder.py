@@ -26,9 +26,9 @@ def normalize_basis(basis):
     basis *= (-1)**(np.sum(basis, axis=1)<0)[:,np.newaxis]
     return basis
 
-def GCDautoencode(hidden, thres=1e-1, fraction=0.02): 
+def GCDautoencode(hidden, hidden2, thres=1e-1, fraction=0.02): 
     '''
-    Input: hidden states which are secretely a lattice X
+    Input: hidden states which are secretely a lattice X; hidden2 is the second to last hidden states
     Output: Manifest integer lattice Z, bias b, and basis A. We want |X - AZ + b| small and Z close to integers
     two hyperparameters as input: 
     thres: a threshold parameter, smaller means more strict
@@ -86,7 +86,7 @@ def GCDautoencode(hidden, thres=1e-1, fraction=0.02):
         vol_arr = get_vol_arr(arr)
         ii = 0
         arr_len = arr.shape[0]
-        while arr.shape[0] >= D+2:
+        while arr.shape[0] >= np.maximum(D+1, 5):
             va = arr[[0]]; vb = arr[[1]]; v3 = arr[2:D+1]
             a = np.linalg.det(np.concatenate([va, v3], axis=0))
             b = np.linalg.det(np.concatenate([vb, v3], axis=0))
@@ -138,13 +138,16 @@ def GCDautoencode(hidden, thres=1e-1, fraction=0.02):
     # translate integer lattice to be non-negative
     min_value = np.min(Z, axis=0)
     Z = Z - min_value[np.newaxis,:]
-    b += np.sum(A * min_value[np.newaxis,:], axis=0)
+    b += np.sum(min_value[:,np.newaxis]*A, axis=0)
     
     # correct b: Az + b = hidden
     error = np.matmul(Z, A) + b - hidden
     b -= np.mean(error, axis=0)
+    
+    # project second to last hidden states to the lattice
+    Z_last2 = np.matmul(hidden2 - b, np.linalg.inv(A))
 
-    return A,b,Z
+    return A,b,Z,Z_last2
 # metrics to evaulate the quality of integer lattice
 
         # Metric 1: rounding error (never used in code; Max just wants to save it)
@@ -154,15 +157,16 @@ def rounding_error(Z):
 
 
 # Metric 2: description length, which is simply addition of model complexity and data complexity
-def description_length(X, A, b, Z, eps=1e-8):
+def description_length(X, A, b, Z, eps=1e-2):
 
     def model_complexity(Z):
         '''after rounding Z to integers, how many bits are needed to store Z?'''
         return np.mean(np.log2(1+np.abs(np.round(Z))))
 
-    def data_complexity(X, A, b, Z, eps=1e-8):
+    def data_complexity(X, A, b, Z, eps=eps):
         '''after rounding Z to integers, how large is the error = X - (A*Z + b)'''
         error = X - (np.matmul(np.round(Z), A) + b)
+        #error = np.abs(Z - np.round(Z))
         return np.mean(np.log2(1+np.abs(error)/eps))
 
     model_c = model_complexity(Z)
@@ -171,7 +175,7 @@ def description_length(X, A, b, Z, eps=1e-8):
     if np.isnan(dl):
         dl = 1e8
     return dl
-def integer_autoencoder_quality(X, A, b, Z, eps=1e-8):
+def integer_autoencoder_quality(X, A, b, Z, eps=1e-2):
     return description_length(X, A, b, Z, eps=eps), rounding_error(Z)
 
 def LinRNNautoencode(X_last, X_last2, inputs_last): 
@@ -212,7 +216,7 @@ def LinRNNautoencode(X_last, X_last2, inputs_last):
     determine a shift vector (move a hidden state to origin)
     choose the hidden state to be the one that minimize its coordinate sum (one can choose other conventions too)
     '''
-    b = X_last[np.argmin(np.sum(X_last, axis=1))]
+    b = copy.deepcopy(X_last[np.argmin(np.sum(X_last, axis=1))])
     Z_last = np.matmul(X_last - b, np.linalg.inv(A))
     Z_last2 = np.matmul(X_last2 - b, np.linalg.inv(A))
     
@@ -221,7 +225,14 @@ def LinRNNautoencode(X_last, X_last2, inputs_last):
     min_value = np.min(Z_last, axis=0)
     Z_last = Z_last - min_value[np.newaxis,:]
     Z_last2 = Z_last2 - min_value[np.newaxis,:]
-    b += np.sum(A * min_value[np.newaxis,:], axis=0)
+    b += np.sum(min_value[:,np.newaxis]*A, axis=0)
+    
+    # correct b: Az + b = hidden
+    error = np.matmul(Z_last, A) + b - X_last
+    b -= np.mean(error, axis=0)
+    
+    
+    Z_last2 = np.matmul(X_last2 - b, np.linalg.inv(A))
 
     '''
     basis: basis vectors for the lattice
