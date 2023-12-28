@@ -9,9 +9,12 @@ position, the output is the XOR of the input and zero. At the second
 position the output is the parity zero, first element, and second
 element. Sequences are of length 10.
 
+Author: Eric Michaud
+
 -------------------------------------------------------------------
 """
 
+import os
 from math import floor, ceil
 import random
 import gzip
@@ -44,10 +47,10 @@ if __name__ == "__main__":
     sequences_x_test = sequences_x[int(D * split):]
     sequences_y_train = sequences_y[:int(D * split)]
     sequences_y_test = sequences_y[int(D * split):]
-    import code; code.interact(local=locals())
+    # import code; code.interact(local=locals())
     torch.save((
         sequences_x_train, 
         sequences_y_train,
         sequences_x_test, 
         sequences_y_test
-    ), "data.pt")
+    ), os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.pt"))
