@@ -34,6 +34,7 @@ SLURM_TEMPLATE = """#!/bin/bash
 #SBATCH --error={path}/slurm-%A.err
 #SBATCH --mem=8GB
 
+conda activate phase-changes
 echo "started" > {path}/status.txt
 python {architecture_search_script} {args}
 if [ $? -eq 0 ]; then

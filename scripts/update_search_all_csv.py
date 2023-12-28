@@ -33,34 +33,24 @@ import re
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, required=True,
-        help="Path to the config file specifying the tasks to run and their search args.")
-    parser.add_argument('--save_dir', type=str, required=True, help="Directory to save all runs and results.")
+    parser.add_argument('--save_dir', type=str, required=True, 
+        help="Directory where runs and results were saved. A unix timestamp.")
     args = parser.parse_args()
     # expand the paths to full absolute paths
-    args.config = os.path.abspath(args.config)
     args.save_dir = os.path.abspath(args.save_dir)
 
-    # load up the config specifying the jobs and their search args
-    with open(args.config, 'r') as f:
+    # load up the config that was used to run this search
+    # it's `search.yaml` inside the save_dir
+    with open(os.path.join(args.save_dir, 'search.yaml'), 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
-    # list the SEARCH_TIMESTAMP directories in save_dir by listing the directories
-    # and filtering out ones that aren't integers
+    # only consider the configs with `include: true`
+    config = {task: task_config for task, task_config in config.items() if task_config['include']}
 
-    # list directories in save_dir
-    dirs = os.listdir(args.save_dir)
-    # filter out non-integer directories
-    dirs = [d for d in dirs if re.match(r'^\d+$', d)]
-    # sort by integer value
-    dirs = sorted(dirs, key=lambda d: int(d))
-
-    # for now just use the most recent timestamp
-    SEARCH_TIMESTAMP = dirs[-1]
     results = []
     for task, task_config in config.items():
-        if os.path.exists(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml')):
-            with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, task, 'smallest_run_args.yaml'), 'r') as f:
+        if os.path.exists(os.path.join(args.save_dir, task, 'smallest_run_args.yaml')):
+            with open(os.path.join(args.save_dir, task, 'smallest_run_args.yaml'), 'r') as f:
                 best_args = yaml.load(f, Loader=yaml.FullLoader)
             if best_args is None: # under what circumstances is this True?
                 results.append((task, "error"))
@@ -86,7 +76,7 @@ if __name__ == '__main__':
             results.append((task, "failure"))
     
     # save these to a dedicated CSV within the SEARCH_TIMESTAMP directory
-    with open(os.path.join(args.save_dir, SEARCH_TIMESTAMP, 'results.csv'), 'w') as f:
+    with open(os.path.join(args.save_dir, 'results.csv'), 'w') as f:
         f.write('task,status,output_mlp_depth,hidden_mlp_depth,hidden_dim,output_mlp_width,hidden_mlp_width,input_dim,output_dim,loss_fn,vectorize_input,save_dir\n')
         for result in results:
             f.write(','.join([str(x) for x in result]) + '\n')
