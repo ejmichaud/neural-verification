@@ -663,7 +663,7 @@ rnn_vowel_counter:
         seeds_per_run: 5
 
 polish1:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: true
@@ -676,7 +676,7 @@ polish1:
         seeds_per_run: 5
 
 polish2:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: true
@@ -689,7 +689,7 @@ polish2:
         seeds_per_run: 5
 
 polish3:
-    include: true
+    include: false
     args:
         loss_fn: "log"
         vectorize_input: true
@@ -697,6 +697,392 @@ polish3:
         output_dim: 1
         activation: "ReLU"
         steps: 30000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_dihedral:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 14
+        output_dim: 14
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_permutations:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 24
+        output_dim: 24
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_transpositions:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 6
+        output_dim: 4
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_add_mod:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 19
+        output_dim: 19
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_mult_mod:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 19
+        output_dim: 19
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_div_mod:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 18
+        output_dim: 18
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_sub_mod:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 19
+        output_dim: 19
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_alternating4:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 12
+        output_dim: 12
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_alternating5:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 60
+        output_dim: 60
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_spinors:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 3
+        output_dim: 4
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_quaternions:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 4
+        output_dim: 3
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_variance:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_skewness:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_excess_kurtosis:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_rms:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_covariance:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 3
+        output_dim: 9
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_line_of_best_fit:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 2
+        output_dim: 2
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_dot_product:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 2
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_continued_fraction:
+    include: true
+    args:
+        input_dim: 2
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_path_length:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 2
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_set_size:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: true
+        input_dim: 2
+        output_dim: 1
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_long_division:
+    include: true
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 10
+        output_dim: 10
+        activation: "ReLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_trapezoidal_integration:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 2
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+# rnn_bayesian_update_beta:
+#     include: true
+#     args:
+#         loss_fn: "?"
+#         input_dim: 1
+#         output_dim: 1
+#         activation: "SiLU"
+#         steps: 10000
+#         train_batch_size: 4096
+#         test_batch_size: 65536
+#         seeds_per_run: 5
+
+rnn_bayesian_update_dirichlet:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: true
+        input_dim: 3
+        output_dim: 3
+        activation: "SiLU"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+# rnn_card_counting:
+#     include: true
+#     args:
+#         loss_fn: "?"
+#         input_dim: 1
+#         output_dim: 1
+#         activation: "ReLU"
+#         steps: 10000
+#         train_batch_size: 4096
+#         test_batch_size: 65536
+#         seeds_per_run: 5
+
+rnn_unix_checksum:
+    include: false
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 1
+        output_dim: 32
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+rnn_bluetooth_checksum:
+    include: false
+    args:
+        loss_fn: "cross_entropy"
+        vectorize_input: true
+        input_dim: 1
+        output_dim: 16
+        activation: "Tanh"
+        steps: 10000
+        train_batch_size: 4096
+        test_batch_size: 65536
+        seeds_per_run: 5
+
+# rnn_forward_passes:
+#     include: true
+#     args:
+#         loss_fn: "?"
+#         vectorize_input: false
+#         input_dim: 12
+#         output_dim: 3
+#         activation: "SiLU"
+#         steps: 10000
+#         train_batch_size: 4096
+#         test_batch_size: 65536
+#         seeds_per_run: 5
+
+rnn_dithering:
+    include: true
+    args:
+        loss_fn: "log"
+        vectorize_input: false
+        input_dim: 1
+        output_dim: 1
+        activation: "SiLU"
+        steps: 10000
         train_batch_size: 4096
         test_batch_size: 65536
         seeds_per_run: 5
