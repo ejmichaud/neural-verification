@@ -35,7 +35,7 @@ if __name__ == "__main__":
     sequences_x = torch.randint(0, 2, (D, 100, 1), dtype=torch.int64)  # dimensions are (batch, sequence length, channels)
     remainder = torch.zeros((D, n_generator_digits-1))
     sequences_y = []
-    for i in range(1, 100):
+    for i in range(0, 100):
         remainder = torch.cat([remainder, sequences_x[:,i:i+1,0]], axis=1)
         remainder = (remainder + remainder[:,:1]*generator)[:,1:] % 2
         sequences_y.append(remainder)
