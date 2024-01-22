@@ -1,0 +1,13 @@
+
+def f(s):
+    a = 100;b = 99;
+    ys = []
+    for i in range(10):
+        c = s[i]
+        next_a = b
+        next_b = -(c-100)-1
+        a = next_a;b = next_b;
+        y = abs(b-a)
+        ys.append(y)
+    return ys
+    

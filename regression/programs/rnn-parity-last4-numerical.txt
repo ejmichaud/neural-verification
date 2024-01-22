@@ -1,0 +1,1 @@
+success_flag = 0 # input_dim + hidden_dim > 6 or hidden_dim > 2 for symbolic regression

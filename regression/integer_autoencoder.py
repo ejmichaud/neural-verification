@@ -192,8 +192,8 @@ def LinRNNautoencode(X_last, X_last2, inputs_last):
     X = np.concatenate([inputs_last, X_last2], axis=1)
     y = X_last
     reg = LinearRegression().fit(X, y)
-    Wh = reg.coef_[:,1:]
-    Wx = reg.coef_[:,[0]]
+    Wh = reg.coef_[:,inputs_last.shape[1]:]
+    Wx = reg.coef_[:,:inputs_last.shape[1]]
     
     '''
     determine basis vectors for the lattice
@@ -266,6 +266,8 @@ if __name__ == "__main__":
             outs.append(out)
         return torch.stack(outs).permute(1,0,2), hidden.cpu().detach().numpy(), hidden_second_last.cpu().detach().numpy()
     
+    # what if inputs are not 1D??
+    # treat bit addition
     _, hidden, hidden2 = get_hidden(model,data[0].unsqueeze(dim=2))
     
     inputs_last = data[0][:,[-1]].cpu().detach().numpy()

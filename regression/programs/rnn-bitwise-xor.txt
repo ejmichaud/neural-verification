@@ -1,0 +1,12 @@
+
+def f(s,t):
+    a = 0;
+    ys = []
+    for i in range(10):
+        b = s[i]; c = t[i];
+        next_a = b ^ c
+        a = next_a;
+        y = a
+        ys.append(y)
+    return ys
+    

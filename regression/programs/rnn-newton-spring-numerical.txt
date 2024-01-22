@@ -1,0 +1,13 @@
+
+def f(s):
+    a = 64;b = 57;
+    ys = []
+    for i in range(10):
+        x = s[i]
+        next_a = a+b-x-57
+        next_b = -a+121
+        a = next_a;b = next_b;
+        y = -a+64
+        ys.append(y)
+    return ys
+    

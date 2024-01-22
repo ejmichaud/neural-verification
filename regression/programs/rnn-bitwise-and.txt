@@ -1,0 +1,13 @@
+
+def f(s,t):
+    a = 0;b = 1;
+    ys = []
+    for i in range(10):
+        c = s[i]; d = t[i];
+        next_a = (not a and not b and c and d) or (not a and b and not c and d) or (not a and b and c and not d) or (not a and b and c and d) or (a and not b and c and d) or (a and b and c and d)
+        next_b = c+d==0 or c+d==2
+        a = next_a;b = next_b;
+        y = a+b>1
+        ys.append(y)
+    return ys
+    

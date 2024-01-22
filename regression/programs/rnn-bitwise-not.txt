@@ -1,0 +1,12 @@
+
+def f(s):
+    a = 1;
+    ys = []
+    for i in range(10):
+        x = s[i]
+        next_a = +x
+        a = next_a;
+        y = -a+1
+        ys.append(y)
+    return ys
+    

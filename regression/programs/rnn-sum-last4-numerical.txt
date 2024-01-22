@@ -1,0 +1,15 @@
+
+def f(s):
+    a = 392;b = 99;c = 99;d = 0;
+    ys = []
+    for i in range(10):
+        x = s[i]
+        next_a = a-b-x+99
+        next_b = -b-d+198
+        next_c = -x+99
+        next_d = -a+b+c+193
+        a = next_a;b = next_b;c = next_c;d = next_d;
+        y = -a+391
+        ys.append(y)
+    return ys
+    
