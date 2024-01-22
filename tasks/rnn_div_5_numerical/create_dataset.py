@@ -47,7 +47,7 @@ if __name__ == "__main__":
         cumulant = cumulant * 2 + sequences_x[:,i,:]
         cumulant, remainder = cumulant % 5, cumulant // 5
         sequences_y.append(remainder)
-    sequences_y = torch.stack(sequences_y, dim=1)
+    sequences_y = torch.stack(sequences_y[1:], dim=1)
     sequences_x = sequences_x.type(torch.int32)
     sequences_y = sequences_y.type(torch.int32)
 
