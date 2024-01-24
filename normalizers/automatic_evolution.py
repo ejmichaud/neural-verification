@@ -12,11 +12,6 @@ import evolution_tree
 
 if __name__ == "__main__":
 
-
-    ### Two usage options:
-    ### python evolution_tree.py <task_name>
-    ### python evolution_tree.py <task_name> <simplifier> <model> <options...>
-
     dataset_path = "../tasks/"
     original_raw_models_path = "./rnn_tests/raw_models/"
     original_processed_models_path = "./rnn_tests/processed_models/"
@@ -28,11 +23,20 @@ if __name__ == "__main__":
         config = yaml.load(f, Loader=yaml.FullLoader)
     task_names_in_yaml = list(config.keys())
 
-    task_names = list(set(task_names_with_models) & set(task_names_with_datasets) & set(task_names_in_yaml))
-    task_names2 = list(set(task_names_with_models) & set(task_names_with_create_datasets) & set(task_names_in_yaml))
-    print(task_names)
-    print(set(task_names2)-set(task_names))
-    
+    task_names = set(task_names_with_models)
+    no_create_dataset = set(task_names) - set(task_names_with_create_datasets)
+    no_dataset = set(task_names) - set(task_names_with_datasets)
+    no_yaml = set(task_names) - set(task_names_in_yaml)
+    print(no_create_dataset)
+    print(no_dataset)
+    print(no_yaml)
+    if no_create_dataset:
+        raise ValueError
+    if no_dataset:
+        raise ValueError
+    if no_yaml:
+        raise ValueError
+   
     for task in task_names:
         raw_models_path = original_raw_models_path + task + "/"
         processed_models_path = original_processed_models_path + task + "/"
@@ -46,29 +50,64 @@ if __name__ == "__main__":
         else:
             tree.init_from_raw_models()
 
-        simplifiers_in_order = tuple(map(lambda s: "normalizers/" + s + ".py", ("prune_dead_neurons_rnn", "rotate_hidden_space", "prune_hidden_dim", "align_hidden_space", "quantize_weights")))
         model = processed_models_path + task + "/model_perfect.pt"
 
         short_names_to_simplifiers = {val:key for key, val in evolution_tree.simplifier_short_names.items()}
-        normalizer_tree = ["prune",
-                ["jnf",
-                    ["compress",
-                        ["quantize",
-                            ["prune"]]]],
-                ["rotate",
-                    ["compress",
-                        ["quantize",
-                            ["prune"]]]],
-                ["align",
-                    ["compress",
-                        ["quantize",
-                            ["prune"]]]],
-                ["diagonalize",
-                    ["compress",
-                        ["quantize",
-                            ["prune"]]]],
-        ]
-        progress_bar = tqdm.tqdm(total=17, desc="Simplifying", unit="iteration")
+#        normalizer_tree = ["actreduce"]
+        normalizer_tree = ["whiten",
+                ["jnf2",
+                    ["toeplitz",
+                        ["debias",
+                            ["quantize"]]]]]
+
+#        normalizer_tree = ["jnf2",
+#                ["toeplitz",
+#                    ["mdl",
+#                        ["jnf2",
+#                            ["toeplitz",
+#                                ["quantize"]]],
+#                        ["quantize"]],
+#                    ["quantize"]]]
+
+#        normalizer_tree = ["mdl",
+#                ["jnf2",
+#                    ["toeplitz",
+#                        ["mdl",
+#                            ["quantize"]],
+#                        ["quantize"]]],
+#                ["quantize"]]
+
+#        normalizer_tree = ["prune",
+#                ["jnf2",
+#                    ["toeplitz",
+#                        ["quantize",
+#                            ["prune",
+#                                ["compress"]]]],
+#                    ["compress",
+#                        ["quantize",
+#                            ["prune"]]]],
+#                ["mdl",
+#                    ["compress",
+#                        ["quantize",
+#                            ["prune"]]]],
+#                ["jnf",
+#                    ["compress",
+#                        ["quantize",
+#                            ["prune"]]]],
+#                ["rotate",
+#                    ["compress",
+#                        ["quantize",
+#                            ["prune"]]]],
+#                ["align",
+#                    ["compress",
+#                        ["quantize",
+#                            ["prune"]]]],
+#                ["diagonalize",
+#                    ["compress",
+#                        ["quantize",
+#                            ["prune"]]]],
+#        ]
+        progress_bar = tqdm.tqdm(total=str(normalizer_tree).count("["), desc="Simplifying", unit="iteration")
 
         def normalize(normalizer_tree, old_model):
             simplifier = short_names_to_simplifiers[normalizer_tree[0]]

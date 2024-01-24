@@ -96,6 +96,7 @@ class EvolutionTree():
         result = subprocess.run(arguments, capture_output=True, text=True)
         stdout = result.stdout
         stderr = result.stderr
+#        print(stdout)
         if stderr:
             print(arguments)
             print(stdout)
@@ -133,8 +134,18 @@ simplifiers_information = {
         "normalizers/align_hidden_space.py": ("-t",),
         "normalizers/diagonalize_transition.py": (),
         "normalizers/jnf_transition.py": (),
+        "normalizers/jnf_transition2.py": ("-e",),
+        "normalizers/toeplitz.py": (),
+        "normalizers/minimize_description_length.py": ("-t",),
+        "normalizers/rescale_input.py": (),
+        "normalizers/rescale_output.py": (),
         "normalizers/prune_hidden_dim.py": ("-t",),
         "normalizers/quantize_weights.py": ("-t",),
+        "normalizers/whitening.py": ("-e",),
+        "normalizers/debias.py": ("-e",),
+        "normalizers/noread.py": ("-e",),
+        "normalizers/activation_pruner.py": ("-e",),
+        "normalizers/rescale_relu.py": (),
 }
 default_parameters = {
         "normalizers/prune_dead_neurons_rnn.py": (0.1,),
@@ -142,8 +153,18 @@ default_parameters = {
         "normalizers/align_hidden_space.py": (500,),
         "normalizers/diagonalize_transition.py": (),
         "normalizers/jnf_transition.py": (),
+        "normalizers/jnf_transition2.py": (0.7,),
+        "normalizers/toeplitz.py": (),
+        "normalizers/minimize_description_length.py": (800,),
+        "normalizers/rescale_input.py": (),
+        "normalizers/rescale_output.py": (),
         "normalizers/prune_hidden_dim.py": (0.1,),
         "normalizers/quantize_weights.py": (0.01,),
+        "normalizers/whitening.py": (0.1,),
+        "normalizers/debias.py": (0.1,),
+        "normalizers/noread.py": (0.1,),
+        "normalizers/activation_pruner.py": (0.01,),
+        "normalizers/rescale_relu.py": (),
 }
 simplifier_short_names = {
         "normalizers/prune_dead_neurons_rnn.py": "prune",
@@ -151,13 +172,34 @@ simplifier_short_names = {
         "normalizers/align_hidden_space.py": "align",
         "normalizers/diagonalize_transition.py": "diagonalize",
         "normalizers/jnf_transition.py": "jnf",
+        "normalizers/jnf_transition2.py": "jnf2",
+        "normalizers/toeplitz.py": "toeplitz",
+        "normalizers/minimize_description_length.py": "mdl",
+        "normalizers/rescale_input.py": "inrescale",
+        "normalizers/rescale_output.py": "outrescale",
         "normalizers/prune_hidden_dim.py": "compress",
         "normalizers/quantize_weights.py": "quantize",
+        "normalizers/whitening.py": "whiten",
+        "normalizers/debias.py": "debias",
+        "normalizers/noread.py": "noread",
+        "normalizers/activation_pruner.py": "actreduce",
+        "normalizers/rescale_relu.py": "reluscale",
 }
 metric_names = {
-        "metrics/all_rnn.py": (("neurons", "Neurons: "), ("weights", "Weights: "), ("norm", "Weight norm: "), ("hidden_dim", "Hidden dim: "), ("loss", "Loss: "), ("accuracy", "Accuracy: "), ("ac_sparsity", "Activation sparsity: "),),
+        "metrics/all_rnn.py": (
+            ("neurons", "Neurons: "),
+            ("weights", "Weights: "),
+            ("biases", "Biases: "),
+            ("norm", "Weight norm: "),
+            ("hidden_dim", "Hidden dim: "),
+            ("loss", "Loss: "),
+            ("accuracy", "Accuracy: "),
+            ("ac_sparsity", "Activation sparsity: "),
+            ("int_weights", "Integer weights: "),
+            ("int_biases", "Integer biases: "),
+            ("params", "Parameters: "),
+        ),
 }
-
 
 if __name__ == "__main__":
 
@@ -168,6 +210,8 @@ if __name__ == "__main__":
     raw_models_path = "./rnn_tests/raw_models/"
     processed_models_path = "./rnn_tests/processed_models/"
     task = sys.argv[1]
+    print(raw_models_path)
+    print(task)
     assert os.path.exists(raw_models_path + task + "/")
     raw_models_path = raw_models_path + task + "/"
     processed_models_path = processed_models_path + task + "/"
