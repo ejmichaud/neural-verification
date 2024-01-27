@@ -126,54 +126,38 @@ print("Weights: " + str(weight_count))
 print("Weight norm: " + str(weight_norm))
 print("Hidden dim: " + str(hidden_dim))
 
+def betterprint(X):
+    print(goodrepr(X))
+def goodrepr(X):
+    if isinstance(X, dict):
+        return "{" + ",\n".join([key + ":\n" + goodrepr(val) for key, val in X.items()]) + "\n}"
+    if type(X) == list:
+        return "[" + "\n".join([goodrepr(x) for x in X]) + "]"
+    elif isinstance(X, np.ndarray):
+        return np.array2string(X, max_line_width=100, precision=4, suppress_small=True)
+    elif torch.is_tensor(X):
+        return goodrepr(X.numpy())
+    else:
+        return str(X)
+#        print(type(X))
+#        raise ValueError
+
 print("")
 print("Weights:")
-print(weights)
-#print(torch.linalg.svd(weights['hmlp.mlp.0.weight'][:,:5]))
-#print(torch.matmul(weights['hmlp.mlp.0.weight'][:,:5], torch.matmul(weights['hmlp.mlp.0.weight'][:,:5], torch.matmul(weights['hmlp.mlp.0.weight'][:,:5], torch.matmul(weights['hmlp.mlp.0.weight'][:,:5], torch.matmul(weights['hmlp.mlp.0.weight'][:,:5], weights['hmlp.mlp.0.weight'][:,:5]))))))
-#powers_of_W = [torch.eye(5)]
-#for i in range(10):
-#    print(torch.matmul(torch.matmul(weights['ymlp.mlp.0.weight'], powers_of_W[-1]), weights['hmlp.mlp.0.weight'][:,-1]))
-#    powers_of_W.append(torch.matmul(weights['hmlp.mlp.0.weight'][:,:5], powers_of_W[-1]))
-#print(weights)
-
+betterprint(weights)
 print("")
 print("")
 
-cumulative_product = torch.eye(hidden_dim+input_dim)
 for i in range((len(rnn.hmlp.mlp)+1)//2):
-    cumulative_product = torch.matmul(rnn.hmlp.mlp[2*i].weight, cumulative_product)
-cumulative_product = cumulative_product[:,:hidden_dim]
+    if i == 0:
+        cumulative_product = rnn.hmlp.mlp[2*i].weight
+    else:
+        cumulative_product = torch.matmul(rnn.hmlp.mlp[2*i].weight, cumulative_product)
+#cumulative_product = cumulative_product[:,:hidden_dim]
+#cumulative_product = torch.Tensor(np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1], [0, 0, 0, 0]]))
+#cumulative_product = torch.Tensor(np.array([[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1]]))
+#print(torch.linalg.inv(cumulative_product))
+
 with torch.no_grad():
-    eigvals, eigvects = np.linalg.eig(cumulative_product.numpy())
-#if hidden_dim <= 5:
-#    permutations = list(map(np.array, itertools.permutations(list(range(hidden_dim)))))
-#else:
-#    permutations = [np.random.permtation(hidden_dim) for i in range(120)]
-permutations = [np.random.permutation(hidden_dim) for i in range(120)]
-with torch.no_grad():
-    best_V = None
-    best_det = 0
-    for permutation in permutations:
-        jnf = np.diag(eigvals[permutation])
-        i, j = np.indices(cumulative_product.shape)
-        jnf[i+1==j] = 1
-        S, V = np.linalg.eig(jnf)  # Vdiag(S)V^{-1}=jnf
-        det = np.abs(np.linalg.det(V))
-        if det > best_det:
-            best_det = det
-            best_V = V
-            print(jnf)
-    transform = torch.tensor(eigvects.dot(np.linalg.inv(best_V)))
-    inv_transform = torch.tensor(best_V.dot(np.linalg.inv(eigvects)))
-    if transform.dtype == torch.cfloat:
-        transform = transform.real
-    if inv_transform.dtype == torch.cfloat:
-        inv_transform = inv_transform.real
-
-print(transform)
-print(inv_transform)
-
-
-print('Transformed RNN hidden space using matrix: ' + str(transform))
-
+    W = cumulative_product.numpy()
+print(W)
