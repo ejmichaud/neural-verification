@@ -1,4 +1,4 @@
-bit_addition:
+Binary_Addition:
   args:
     activation: ReLU
     input_dim: 2
@@ -10,7 +10,7 @@ bit_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_abs_value_numerical:
+Abs_Current:
   args:
     activation: ReLU
     input_dim: 1
@@ -22,7 +22,7 @@ rnn_abs_value_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_abs_value_of_diff_numerical:
+Abs_Diff:
   args:
     activation: ReLU
     input_dim: 1
@@ -34,7 +34,7 @@ rnn_abs_value_of_diff_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_add_mod_3_numerical:
+Add_Mod_3:
   args:
     activation: ReLU
     input_dim: 1
@@ -46,7 +46,7 @@ rnn_add_mod_3_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_add_mod_4_numerical:
+Add_Mod_4:
   args:
     activation: ReLU
     input_dim: 1
@@ -58,7 +58,7 @@ rnn_add_mod_4_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_add_mod_5_numerical:
+Add_Mod_5:
   args:
     activation: ReLU
     input_dim: 1
@@ -70,7 +70,7 @@ rnn_add_mod_5_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_add_mod_6_numerical:
+Add_Mod_6:
   args:
     activation: ReLU
     input_dim: 1
@@ -82,7 +82,7 @@ rnn_add_mod_6_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_add_mod_7_numerical:
+Add_Mod_7:
   args:
     activation: ReLU
     input_dim: 1
@@ -94,7 +94,7 @@ rnn_add_mod_7_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_add_mod_8_numerical:
+Add_Mod_8:
   args:
     activation: ReLU
     input_dim: 1
@@ -106,7 +106,7 @@ rnn_add_mod_8_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_alternating_last3_numerical:
+Alternating_Last3:
   args:
     activation: ReLU
     input_dim: 1
@@ -118,7 +118,7 @@ rnn_alternating_last3_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_alternating_last4_numerical:
+Alternating_Last4:
   args:
     activation: ReLU
     input_dim: 1
@@ -130,7 +130,7 @@ rnn_alternating_last4_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_balanced_parenthesis_numerical:
+Balanced_Parenthesis:
   args:
     activation: ReLU
     input_dim: 1
@@ -142,7 +142,7 @@ rnn_balanced_parenthesis_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_base_3_addition:
+Base_3_Addition:
   args:
     activation: ReLU
     input_dim: 2
@@ -154,7 +154,7 @@ rnn_base_3_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_base_4_addition:
+Base_4_Addition:
   args:
     activation: ReLU
     input_dim: 2
@@ -166,7 +166,7 @@ rnn_base_4_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_base_5_addition:
+Base_5_Addition:
   args:
     activation: ReLU
     input_dim: 2
@@ -178,7 +178,7 @@ rnn_base_5_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_base_6_addition:
+Base_6_Addition:
   args:
     activation: ReLU
     input_dim: 2
@@ -190,7 +190,7 @@ rnn_base_6_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_base_7_addition:
+Base_7_Addition:
   args:
     activation: ReLU
     input_dim: 2
@@ -202,7 +202,7 @@ rnn_base_7_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_base_8_addition:
+Base_8_Addition:
   args:
     activation: ReLU
     input_dim: 2
@@ -214,7 +214,7 @@ rnn_base_8_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_bit_dot_prod_mod2_numerical:
+Bit_Dot_Prod_Mod2:
   args:
     activation: ReLU
     input_dim: 2
@@ -226,7 +226,7 @@ rnn_bit_dot_prod_mod2_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_bit_palindromes_numerical:
+Bit_Palindrome:
   args:
     activation: ReLU
     input_dim: 1
@@ -238,7 +238,7 @@ rnn_bit_palindromes_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_bit_shift_right_numerical:
+Bit_Shift_Right:
   args:
     activation: ReLU
     input_dim: 1
@@ -250,7 +250,7 @@ rnn_bit_shift_right_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_bitwise_and:
+Bitwise_And:
   args:
     activation: ReLU
     input_dim: 2
@@ -262,7 +262,7 @@ rnn_bitwise_and:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_bitwise_not:
+Bitwise_Not:
   args:
     activation: ReLU
     input_dim: 1
@@ -274,7 +274,7 @@ rnn_bitwise_not:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_bitwise_or:
+Bitwise_Or:
   args:
     activation: ReLU
     input_dim: 2
@@ -286,7 +286,7 @@ rnn_bitwise_or:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_bitwise_xor:
+Bitwise_Xor:
   args:
     activation: ReLU
     input_dim: 2
@@ -298,7 +298,7 @@ rnn_bitwise_xor:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_diff_last2_numerical:
+Diff_Last2:
   args:
     activation: ReLU
     input_dim: 1
@@ -310,7 +310,7 @@ rnn_diff_last2_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_diff_of_abs_value_numerical:
+Diff_Abs_Values:
   args:
     activation: ReLU
     input_dim: 1
@@ -322,7 +322,7 @@ rnn_diff_of_abs_value_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_dithering_numerical:
+Dithering:
   args:
     activation: ReLU
     input_dim: 1
@@ -334,7 +334,7 @@ rnn_dithering_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_div_3_numerical:
+Div_3:
   args:
     activation: ReLU
     input_dim: 1
@@ -346,7 +346,7 @@ rnn_div_3_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_div_5_numerical:
+Div_5:
   args:
     activation: ReLU
     input_dim: 1
@@ -358,7 +358,7 @@ rnn_div_5_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_div_7_numerical:
+Div_7:
   args:
     activation: ReLU
     input_dim: 1
@@ -370,7 +370,7 @@ rnn_div_7_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_evens_counter_numerical:
+Evens_Counter:
   args:
     activation: ReLU
     input_dim: 1
@@ -382,7 +382,7 @@ rnn_evens_counter_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_evens_detector_numerical:
+Evens_Detector:
   args:
     activation: ReLU
     input_dim: 1
@@ -394,7 +394,7 @@ rnn_evens_detector_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_identity_numerical:
+Current_Number:
   args:
     activation: ReLU
     input_dim: 1
@@ -406,7 +406,7 @@ rnn_identity_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_majority0_1_numerical:
+Majority_0_1:
   args:
     activation: ReLU
     input_dim: 1
@@ -418,7 +418,7 @@ rnn_majority0_1_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_majority0_2_numerical:
+Majority_0_2:
   args:
     activation: ReLU
     input_dim: 1
@@ -430,7 +430,7 @@ rnn_majority0_2_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_majority0_3_numerical:
+Majority_0_3:
   args:
     activation: ReLU
     input_dim: 1
@@ -442,7 +442,7 @@ rnn_majority0_3_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_max_numerical:
+Max_Seen:
   args:
     activation: ReLU
     input_dim: 1
@@ -454,7 +454,7 @@ rnn_max_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_min_numerical:
+Min_Seen:
   args:
     activation: ReLU
     input_dim: 1
@@ -466,7 +466,7 @@ rnn_min_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_newton_freebody_numerical:
+Newton_Freebody:
   args:
     activation: ReLU
     input_dim: 1
@@ -478,7 +478,7 @@ rnn_newton_freebody_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_newton_gravity_numerical:
+Newton_Gravity:
   args:
     activation: ReLU
     input_dim: 1
@@ -490,7 +490,7 @@ rnn_newton_gravity_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_newton_magnetic_numerical:
+Newton_Magnetic:
   args:
     activation: ReLU
     input_dim: 2
@@ -502,7 +502,7 @@ rnn_newton_magnetic_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_newton_spring_numerical:
+Newton_Spring:
   args:
     activation: ReLU
     input_dim: 1
@@ -514,7 +514,7 @@ rnn_newton_spring_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_parity_last2_numerical:
+Parity_Last2:
   args:
     activation: ReLU
     input_dim: 1
@@ -526,7 +526,7 @@ rnn_parity_last2_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_parity_last3_numerical:
+Parity_Last3:
   args:
     activation: ReLU
     input_dim: 1
@@ -538,7 +538,7 @@ rnn_parity_last3_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_parity_last4_numerical:
+Parity_Last4:
   args:
     activation: ReLU
     input_dim: 1
@@ -550,7 +550,7 @@ rnn_parity_last4_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_parity_numerical:
+Parity_All:
   args:
     activation: ReLU
     input_dim: 1
@@ -562,7 +562,7 @@ rnn_parity_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_parity_of_index_numerical:
+Parity_Bits_Mod2:
   args:
     activation: ReLU
     input_dim: 1
@@ -574,7 +574,7 @@ rnn_parity_of_index_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_parity_of_zeros_numerical:
+Parity_Zeros:
   args:
     activation: ReLU
     input_dim: 1
@@ -586,7 +586,7 @@ rnn_parity_of_zeros_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_perfect_square_detector_numerical:
+Perfect_Square_Detector:
   args:
     activation: ReLU
     input_dim: 1
@@ -598,7 +598,7 @@ rnn_perfect_square_detector_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_prev1_numerical:
+Prev1:
   args:
     activation: ReLU
     input_dim: 1
@@ -610,7 +610,7 @@ rnn_prev1_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_prev2_numerical:
+Prev2:
   args:
     activation: ReLU
     input_dim: 1
@@ -622,7 +622,7 @@ rnn_prev2_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_prev3_numerical:
+Prev3:
   args:
     activation: ReLU
     input_dim: 1
@@ -634,7 +634,7 @@ rnn_prev3_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_prev4_numerical:
+Prev4:
   args:
     activation: ReLU
     input_dim: 1
@@ -646,7 +646,7 @@ rnn_prev4_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_prev5_numerical:
+Prev5:
   args:
     activation: ReLU
     input_dim: 1
@@ -658,7 +658,7 @@ rnn_prev5_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_sum_last2_numerical:
+Sum_Last2:
   args:
     activation: ReLU
     input_dim: 1
@@ -670,7 +670,7 @@ rnn_sum_last2_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_sum_last3_numerical:
+Sum_Last3:
   args:
     activation: ReLU
     input_dim: 1
@@ -682,7 +682,7 @@ rnn_sum_last3_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_sum_last4_numerical:
+Sum_Last4:
   args:
     activation: ReLU
     input_dim: 1
@@ -694,7 +694,7 @@ rnn_sum_last4_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_sum_last5_numerical:
+Sum_Last5:
   args:
     activation: ReLU
     input_dim: 1
@@ -706,7 +706,7 @@ rnn_sum_last5_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_sum_last6_numerical:
+Sum_Last6:
   args:
     activation: ReLU
     input_dim: 1
@@ -718,7 +718,7 @@ rnn_sum_last6_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_sum_last7_numerical:
+Sum_Last7:
   args:
     activation: ReLU
     input_dim: 1
@@ -730,7 +730,7 @@ rnn_sum_last7_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_sum_numerical:
+Sum_All:
   args:
     activation: ReLU
     input_dim: 1
@@ -742,7 +742,7 @@ rnn_sum_numerical:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_unique2_numerical:
+Previous_Equals_Current:
   args:
     activation: ReLU
     input_dim: 1
