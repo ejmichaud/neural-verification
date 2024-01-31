@@ -202,18 +202,6 @@ rnn_base_7_addition:
     train_batch_size: 4096
     vectorize_input: false
   include: true
-rnn_base_8_addition:
-  args:
-    activation: ReLU
-    input_dim: 2
-    loss_fn: log
-    output_dim: 1
-    seeds_per_run: 5
-    steps: 20000
-    test_batch_size: 65536
-    train_batch_size: 4096
-    vectorize_input: false
-  include: true
 rnn_bit_dot_prod_mod2_numerical:
   args:
     activation: ReLU
