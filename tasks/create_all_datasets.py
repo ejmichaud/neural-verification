@@ -1,6 +1,5 @@
 import os
 import subprocess
-from tqdm import tqdm
 
 def run_create_dataset_scripts(main_folder):
     failed_scripts = []
@@ -11,8 +10,14 @@ def run_create_dataset_scripts(main_folder):
         
         # Check if it's a directory
         if os.path.isdir(task_path):
+            data_file_path = os.path.join(task_path, "data.pt")
             script_path = os.path.join(task_path, "create_dataset.py")
             
+            # Check if the data.pt file exists, if so, skip this folder
+            if os.path.isfile(data_file_path):
+                print(f"Skipping {task_folder}, data.pt already exists.")
+                continue
+
             # Check if the create_dataset.py script exists in this subfolder
             if os.path.isfile(script_path):
                 try:
@@ -26,5 +31,5 @@ def run_create_dataset_scripts(main_folder):
         for script in failed_scripts:
             print(script)
 
-folder_path = "/home/gridsan/vlad/meng_work/neural-verification/tasks"  # Replace with the path to your scripts
+folder_path = "./"  # Replace with the path to your scripts
 run_create_dataset_scripts(folder_path)
