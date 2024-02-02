@@ -1,62 +1,87 @@
 import subprocess
-import csv
 from tqdm import tqdm
+import argparse
 
 # Define the list of tasks
-tasks = [
-    "balanced_parentheses",
-    "bit_addition",
-    "rnn_abs_value_numerical",
-    "rnn_abs_value_of_diff_numerical",
-    "rnn_bitwise_and",
-    "rnn_bitwise_not",
-    "rnn_bitwise_or",
-    "rnn_count_power_of_2s_bool",
-    "rnn_diff_last2_numerical",
-    "rnn_diff_of_abs_value_numerical",
-    "rnn_identity_numerical",
-    "rnn_majority0_1",
-    "rnn_majority0_2",
-    "rnn_majority0_3",
-    "rnn_majority0_4",
-    "rnn_majority0_5",
-    "rnn_parity_last2_numerical",
-    "rnn_parity_last3_numerical",
-    "rnn_parity_last4_numerical",
-    "rnn_parity_numerical",
-    "rnn_prev1_numerical",
-    "rnn_prev2_numerical",
-    "rnn_prev3_numerical",
-    "rnn_prev4_numerical",
-    "rnn_prev7_numerical",
-    "rnn_prev8_numerical",
-    "rnn_sum_last2_numerical",
-    "rnn_sum_last3_numerical",
-    "rnn_sum_last4_numerical",
-    "rnn_sum_last5_numerical",
-    "rnn_sum_last6_numerical",
-    "rnn_sum_last7_numerical",
-    "rnn_sum_numerical",
-    "rnn_unique2_numerical",
-    "rnn_vowel_counter",
-    "vowel_counter"
-]
+tasks = ['Binary_Addition',
+ 'Base_3_Addition',
+ 'Base_4_Addition',
+ 'Base_5_Addition',
+ 'Base_6_Addition',
+ 'Base_7_Addition',
+ 'Bitwise_Xor',
+ 'Bitwise_Or',
+ 'Bitwise_And',
+ 'Bitwise_Not',
+ 'Parity_Last2',
+ 'Parity_Last3',
+ 'Parity_Last4',
+ 'Parity_All',
+ 'Parity_Zeros',
+ 'Evens_Counter',
+ 'Sum_All',
+ 'Sum_Last2',
+ 'Sum_Last3',
+ 'Sum_Last4',
+ 'Sum_Last5',
+ 'Sum_Last6',
+ 'Sum_Last7',
+ 'Current_Number',
+ 'Prev1',
+ 'Prev2',
+ 'Prev3',
+ 'Prev4',
+ 'Prev5',
+ 'Previous_Equals_Current',
+ 'Diff_Last2',
+ 'Abs_Diff',
+ 'Abs_Current',
+ 'Diff_Abs_Values',
+ 'Min_Seen',
+ 'Max_Seen',
+ 'Majority_0_1',
+ 'Majority_0_2',
+ 'Majority_0_3',
+ 'Evens_Detector',
+ 'Perfect_Square_Detector',
+ 'Bit_Palindrome',
+ 'Balanced_Parenthesis',
+ 'Parity_Bits_Mod2',
+ 'Alternating_Last3',
+ 'Alternating_Last4',
+ 'Bit_Shift_Right',
+ 'Bit_Dot_Prod_Mod2',
+ 'Div_3',
+ 'Div_5',
+ 'Div_7',
+ 'Add_Mod_3',
+ 'Add_Mod_4',
+ 'Add_Mod_5',
+ 'Add_Mod_6',
+ 'Add_Mod_7',
+ 'Add_Mod_8',
+ 'Dithering',
+ 'Newton_Freebody',
+ 'Newton_Gravity',
+ 'Newton_Spring',
+ 'Newton_Magnetic']
 
+# Import argparse and set up argument parsing
+parser = argparse.ArgumentParser(description='Run tasks and extract code.')
+parser.add_argument('--iterations', type=int, default=3, help='Number of iterations to run each task')
+args = parser.parse_args()
 
-def run_task_and_extract_code(task_name):
-    """Run a task, extract code, and return 'Success' or 'Failure'."""
-    try:
-        # Run the task
-        task_result = subprocess.run(["python", "prompt.py", "--task", task_name], capture_output=True, text=True)
-        print("STDOUT:", task_result.stdout)
-        print("STDERR:", task_result.stderr)
+def run_task_and_extract_code(task_name, iterations):
+    for iteration in range(iterations):
+        try:
+            task_result = subprocess.run(["python", "prompt.py", "--task", task_name, "--iterations", str(iterations)], capture_output=True, text=True)
+            # Rest of the code remains the same
+        except Exception as e:
+            print(f"Error running task {task_name}: {e}")
 
-    except Exception as e:
-        print(f"Error running task {task_name}: {e}")
-
-
+# Use the parsed iterations value
 for task in tqdm(tasks):
-    result = run_task_and_extract_code(task)
-print("Task processing complete. Results written to task_results.csv.")
+    run_task_and_extract_code(task, args.iterations)
 
+print("Task processing complete.")
 

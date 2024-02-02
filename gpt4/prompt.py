@@ -1,4 +1,3 @@
-
 from openai import OpenAI
 import os
 import torch
@@ -11,11 +10,12 @@ api_key = "your-key-here"
 client = OpenAI(api_key=api_key)
 
 # Create arguments for the script
-parser = argparse.ArgumentParser(description='What task do you want to run on GPT')
+parser = argparse.ArgumentParser(description='Run GPT tasks')
 parser.add_argument('--task', type=str, default='rnn_identity_numerical', help='task name')
-
+parser.add_argument('--iterations', type=int, default=1, help='number of iterations to run the task')
 args = parser.parse_args()
 task = args.task
+iterations = args.iterations
 
 def write_to_file(filename, content):
     with open(filename, 'w') as file:
@@ -47,9 +47,8 @@ def format_prompt_for_code():
     return prompt
 
 
-def extract_and_save_code_block(text, output_directory):
+def extract_and_save_code_block(text, output_directory, iteration):
     # Define the regex pattern to match the code block
-    # Note: Using re.escape to handle special characters in the delimiters
     start_delimiter = re.escape("```python")
     end_delimiter = re.escape("```")
     pattern = rf"{start_delimiter}(.*?){end_delimiter}"
@@ -59,8 +58,8 @@ def extract_and_save_code_block(text, output_directory):
     if match:
         code_block = match.group(1).strip()  # Extract the code block and strip leading/trailing whitespace
 
-        # Save the code block to a file
-        code_filename = os.path.join(output_directory, "extracted_code.py")
+        # Save the code block to a file with iteration number in the filename
+        code_filename = os.path.join(output_directory, f"extracted_code_{iteration}.py")
         with open(code_filename, 'w') as code_file:
             code_file.write(code_block)
         print(f"Code block saved to {code_filename}")
@@ -85,40 +84,38 @@ def save_conversation(messages, filename):
 
 # Main execution
 
-output_directory = f"./{task}"
-output_file = f"{output_directory}/output_conversation.txt"
+for iteration in range(iterations):
+    iteration_output_directory = f"./{task}/{iteration}"
+    iteration_output_file = f"{iteration_output_directory}/output_conversation.txt"
 
-# Create the output directory if it doesn't exist
-if not os.path.exists(output_directory):
-    os.makedirs(output_directory)
+    # Create the output directory for this iteration if it doesn't exist
+    if not os.path.exists(iteration_output_directory):
+        os.makedirs(iteration_output_directory)
 
-#get the data for the prompts
-file_path = f"../tasks/{task}/data.pt"
-data = read_pt_file(file_path)
+    # Get the data for the prompts
+    file_path = f"../tasks/{task}/data.pt"
+    data = read_pt_file(file_path)
 
-# Reset the messages array
-messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    # Reset the messages array
+    messages = [{"role": "system", "content": "You are a helpful assistant."}]
 
-prompt_formula = format_prompt_for_formula(data)
+    # Formatting and querying GPT for the formula
+    prompt_formula = format_prompt_for_formula(data)
+    messages.append({"role": "user", "content": prompt_formula})
+    response = query_gpt(messages, api_key)
+    if response.choices:
+        assistant_message_content = response.choices[0].message.content  # Extract the string content
+        messages.append({"role": "assistant", "content": assistant_message_content})
 
-messages.append({"role": "user", "content": prompt_formula})
+    # Formatting and querying GPT for the code
+    prompt_code = format_prompt_for_code()
+    messages.append({"role": "user", "content": prompt_code})
+    response = query_gpt(messages, api_key)
+    if response.choices:
+        assistant_message_content = response.choices[0].message.content  # Extract the string content
+        messages.append({"role": "assistant", "content": assistant_message_content})
+        extract_and_save_code_block(assistant_message_content, iteration_output_directory, iteration)
 
-response = query_gpt(messages, api_key)
-if response.choices:
-    assistant_message_content = response.choices[0].message.content  # Extract the string content
-    messages.append({"role": "assistant", "content": assistant_message_content})
-
-prompt_code = format_prompt_for_code()
-
-messages.append({"role": "user", "content": prompt_code})
-
-        
-response = query_gpt(messages, api_key)
-if response.choices:
-    assistant_message_content = response.choices[0].message.content  # Extract the string content
-    messages.append({"role": "assistant", "content": assistant_message_content})
-    extract_and_save_code_block(assistant_message_content, output_directory)
-
-# Save the entire conversation
-save_conversation(messages, output_file)
+    # Save the entire conversation for this iteration
+    save_conversation(messages, iteration_output_file)
 
