@@ -23,18 +23,15 @@ if __name__ == "__main__":
         config = yaml.load(f, Loader=yaml.FullLoader)
     task_names_in_yaml = list(config.keys())
 
-    task_names = set(task_names_with_models)
+    task_names = set(task_names_in_yaml)
     no_create_dataset = set(task_names) - set(task_names_with_create_datasets)
     no_dataset = set(task_names) - set(task_names_with_datasets)
-    no_yaml = set(task_names) - set(task_names_in_yaml)
-    print(no_create_dataset)
-    print(no_dataset)
-    print(no_yaml)
+    no_model = set(task_names_in_yaml) - set(task_names_with_models)
     if no_create_dataset:
         raise ValueError
     if no_dataset:
         raise ValueError
-    if no_yaml:
+    if no_model:
         raise ValueError
    
     for task in task_names:
@@ -53,60 +50,13 @@ if __name__ == "__main__":
         model = processed_models_path + task + "/model_perfect.pt"
 
         short_names_to_simplifiers = {val:key for key, val in evolution_tree.simplifier_short_names.items()}
-#        normalizer_tree = ["actreduce"]
+
         normalizer_tree = ["whiten",
-                ["jnf2",
+                ["jnf",
                     ["toeplitz",
                         ["debias",
                             ["quantize"]]]]]
 
-#        normalizer_tree = ["jnf2",
-#                ["toeplitz",
-#                    ["mdl",
-#                        ["jnf2",
-#                            ["toeplitz",
-#                                ["quantize"]]],
-#                        ["quantize"]],
-#                    ["quantize"]]]
-
-#        normalizer_tree = ["mdl",
-#                ["jnf2",
-#                    ["toeplitz",
-#                        ["mdl",
-#                            ["quantize"]],
-#                        ["quantize"]]],
-#                ["quantize"]]
-
-#        normalizer_tree = ["prune",
-#                ["jnf2",
-#                    ["toeplitz",
-#                        ["quantize",
-#                            ["prune",
-#                                ["compress"]]]],
-#                    ["compress",
-#                        ["quantize",
-#                            ["prune"]]]],
-#                ["mdl",
-#                    ["compress",
-#                        ["quantize",
-#                            ["prune"]]]],
-#                ["jnf",
-#                    ["compress",
-#                        ["quantize",
-#                            ["prune"]]]],
-#                ["rotate",
-#                    ["compress",
-#                        ["quantize",
-#                            ["prune"]]]],
-#                ["align",
-#                    ["compress",
-#                        ["quantize",
-#                            ["prune"]]]],
-#                ["diagonalize",
-#                    ["compress",
-#                        ["quantize",
-#                            ["prune"]]]],
-#        ]
         progress_bar = tqdm.tqdm(total=str(normalizer_tree).count("["), desc="Simplifying", unit="iteration")
 
         def normalize(normalizer_tree, old_model):

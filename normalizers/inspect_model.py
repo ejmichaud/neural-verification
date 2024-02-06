@@ -148,16 +148,11 @@ betterprint(weights)
 print("")
 print("")
 
-for i in range((len(rnn.hmlp.mlp)+1)//2):
-    if i == 0:
-        cumulative_product = rnn.hmlp.mlp[2*i].weight
-    else:
-        cumulative_product = torch.matmul(rnn.hmlp.mlp[2*i].weight, cumulative_product)
-#cumulative_product = cumulative_product[:,:hidden_dim]
-#cumulative_product = torch.Tensor(np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1], [0, 0, 0, 0]]))
-#cumulative_product = torch.Tensor(np.array([[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1]]))
-#print(torch.linalg.inv(cumulative_product))
 
+cumulative_product = torch.eye(hidden_dim+input_dim)
+for i in range((len(rnn.hmlp.mlp)+1)//2):
+    cumulative_product = torch.matmul(rnn.hmlp.mlp[2*i].weight, cumulative_product)
 with torch.no_grad():
     W = cumulative_product.numpy()
-print(W)
+
+betterprint(W)

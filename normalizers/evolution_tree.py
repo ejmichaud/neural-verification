@@ -7,6 +7,11 @@ import pickle
 import subprocess
 
 
+### Two usage options:
+### python evolution_tree.py <task_name>
+### python evolution_tree.py <task_name> <simplifier> <model> <options...>
+
+
 class EvolutionTree():
     """
     This class represents a forest structure whereby the roots of each tree are base models (which are processed from raw models), nodes represent intermediate models, and the edges represent different normalizers that have been applied to the models to produce more normal models.
@@ -129,61 +134,25 @@ class EvolutionTree():
             
 
 simplifiers_information = {
-        "normalizers/prune_dead_neurons_rnn.py": ("-t",),
-        "normalizers/rotate_hidden_space.py": ("-t",),
-        "normalizers/align_hidden_space.py": ("-t",),
-        "normalizers/diagonalize_transition.py": (),
-        "normalizers/jnf_transition.py": (),
-        "normalizers/jnf_transition2.py": ("-e",),
+        "normalizers/jnf_transition.py": ("-e",),
         "normalizers/toeplitz.py": (),
-        "normalizers/minimize_description_length.py": ("-t",),
-        "normalizers/rescale_input.py": (),
-        "normalizers/rescale_output.py": (),
-        "normalizers/prune_hidden_dim.py": ("-t",),
         "normalizers/quantize_weights.py": ("-t",),
         "normalizers/whitening.py": ("-e",),
         "normalizers/debias.py": ("-e",),
-        "normalizers/noread.py": ("-e",),
-        "normalizers/activation_pruner.py": ("-e",),
-        "normalizers/rescale_relu.py": (),
 }
 default_parameters = {
-        "normalizers/prune_dead_neurons_rnn.py": (0.1,),
-        "normalizers/rotate_hidden_space.py": (500,),
-        "normalizers/align_hidden_space.py": (500,),
-        "normalizers/diagonalize_transition.py": (),
-        "normalizers/jnf_transition.py": (),
-        "normalizers/jnf_transition2.py": (0.7,),
+        "normalizers/jnf_transition.py": (0.7,),
         "normalizers/toeplitz.py": (),
-        "normalizers/minimize_description_length.py": (800,),
-        "normalizers/rescale_input.py": (),
-        "normalizers/rescale_output.py": (),
-        "normalizers/prune_hidden_dim.py": (0.1,),
         "normalizers/quantize_weights.py": (0.01,),
         "normalizers/whitening.py": (0.1,),
         "normalizers/debias.py": (0.1,),
-        "normalizers/noread.py": (0.1,),
-        "normalizers/activation_pruner.py": (0.01,),
-        "normalizers/rescale_relu.py": (),
 }
 simplifier_short_names = {
-        "normalizers/prune_dead_neurons_rnn.py": "prune",
-        "normalizers/rotate_hidden_space.py": "rotate",
-        "normalizers/align_hidden_space.py": "align",
-        "normalizers/diagonalize_transition.py": "diagonalize",
         "normalizers/jnf_transition.py": "jnf",
-        "normalizers/jnf_transition2.py": "jnf2",
         "normalizers/toeplitz.py": "toeplitz",
-        "normalizers/minimize_description_length.py": "mdl",
-        "normalizers/rescale_input.py": "inrescale",
-        "normalizers/rescale_output.py": "outrescale",
-        "normalizers/prune_hidden_dim.py": "compress",
         "normalizers/quantize_weights.py": "quantize",
         "normalizers/whitening.py": "whiten",
         "normalizers/debias.py": "debias",
-        "normalizers/noread.py": "noread",
-        "normalizers/activation_pruner.py": "actreduce",
-        "normalizers/rescale_relu.py": "reluscale",
 }
 metric_names = {
         "metrics/all_rnn.py": (
@@ -202,10 +171,6 @@ metric_names = {
 }
 
 if __name__ == "__main__":
-
-    ### Two usage options:
-    ### python evolution_tree.py <task_name>
-    ### python evolution_tree.py <task_name> <simplifier> <model> <options...>
 
     raw_models_path = "./rnn_tests/raw_models/"
     processed_models_path = "./rnn_tests/processed_models/"

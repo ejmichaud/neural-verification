@@ -147,7 +147,7 @@ if is_in_jordan_canonical:
     for start, end in zip(block_splits[:-1], block_splits[1:]):
         while end > start:
             size = end-start
-            X_block = np.concatenate([X[start:end,:], X_bias[start:end,np.newaxis]], axis=1)
+            X_block = X[start:end,:]
             input_choice = np.argmax(np.abs(X_block[-1,:]))
             if np.abs(X_block[-1,input_choice]) > epsilon and np.abs(X_block[-1,input_choice]) > 0.0001:  # Last neuron of jordan block is not dead and has inputs; Toeplitz will be invertible.
                 block_transform = np.zeros((size, size), dtype=X_block.dtype)  # construct an upper triangular Toeplitz matrix. Upper triangular Toeplitz matrices (Jordan blocks included) always commute with each other.

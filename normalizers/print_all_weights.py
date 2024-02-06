@@ -25,26 +25,24 @@ with open("../search.yaml", 'r') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
 task_names_in_yaml = list(config.keys())
 
-task_names = set(task_names_with_models)
+task_names = set(task_names_in_yaml)
 no_create_dataset = set(task_names) - set(task_names_with_create_datasets)
 no_dataset = set(task_names) - set(task_names_with_datasets)
-no_yaml = set(task_names) - set(task_names_in_yaml)
+no_model = set(task_names_in_yaml) - set(task_names_with_models)
 print(no_create_dataset)
 print(no_dataset)
-print(no_yaml)
+print(no_model)
 if no_create_dataset:
     raise ValueError
 if no_dataset:
     raise ValueError
-if no_yaml:
+if no_model:
     raise ValueError
- 
+
 
 for task_name in task_names:
 
-#    task_path = "rnn_tests/processed_models/" + task_name + "/model_perfect_prune_0.1_jnf2_0.3_toeplitz_quantize_0.01.pt"
-#    task_path = "rnn_tests/processed_models/" + task_name + "/model_perfect_prune_0.1_mdl_800_compress_0.1_quantize_0.01.pt"
-    task_path = "rnn_tests/processed_models/" + task_name + "/model_perfect_whiten_0.1_jnf2_0.7_toeplitz_debias_0.1_quantize_0.01.pt"
+    task_path = original_processed_models_path + task_name + "/model_perfect_whiten_0.1_jnf_0.7_toeplitz_debias_0.1_quantize_0.01.pt"
     if not os.path.exists(task_path):
         raise ValueError("trained network not found: " + task_path)
 
