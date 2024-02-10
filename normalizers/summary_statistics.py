@@ -16,51 +16,29 @@ if __name__ == "__main__":
     original_raw_models_path = "./rnn_tests/raw_models/"
     original_processed_models_path = "./rnn_tests/processed_models/"
 
-    task_names_with_trained_models = set([folder for folder in os.listdir(original_processed_models_path) if os.path.isfile(os.path.join(original_processed_models_path, folder, "model_perfect_prune_0.1_diagonalize.pt"))])
-
-    task_names_with_models = set([folder for folder in os.listdir(original_raw_models_path) if os.path.isdir(os.path.join(original_raw_models_path, folder))])
-    task_names_with_create_datasets = set([folder for folder in os.listdir(dataset_path) if os.path.isdir(os.path.join(dataset_path, folder))])
-    task_names_with_datasets = set([folder for folder in os.listdir(dataset_path) if os.path.isfile(os.path.join(dataset_path, folder, "data.pt"))])
+    task_names_with_models = [folder for folder in os.listdir(original_raw_models_path) if os.path.isdir(os.path.join(original_raw_models_path, folder))]
+    task_names_with_create_datasets = [folder for folder in os.listdir(dataset_path) if os.path.isdir(os.path.join(dataset_path, folder))]
+    task_names_with_datasets = [folder for folder in os.listdir(dataset_path) if os.path.isfile(os.path.join(dataset_path, folder, "data.pt"))]
     with open("../search.yaml", 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-    task_names_in_yaml = set(config.keys())
+    task_names_in_yaml = list(config.keys())
 
-    trainable_models = set(task_names_with_models) & set(task_names_with_create_datasets) & set(task_names_in_yaml)
-
-    task_names = set(task_names_with_models)
+    task_names = set(task_names_in_yaml)
     no_create_dataset = set(task_names) - set(task_names_with_create_datasets)
     no_dataset = set(task_names) - set(task_names_with_datasets)
-    no_yaml = set(task_names) - set(task_names_in_yaml)
-    print(no_create_dataset)
-    print(no_dataset)
-    print(no_yaml)
+    no_model = set(task_names_in_yaml) - set(task_names_with_models)
     if no_create_dataset:
         raise ValueError
     if no_dataset:
         raise ValueError
-    if no_yaml:
+    if no_model:
         raise ValueError
-    trainable_models = task_names
- 
+
     task_names_with_trained_models = task_names
 
    
     normalize_sequences = [
-#            ["prune", "jnf",         "compress", "quantize", "prune"],
-#            ["prune", "rotate",      "compress", "quantize", "prune"],
-#            ["prune", "align",       "compress", "quantize", "prune"],
-#            ["prune", "diagonalize", "compress", "quantize", "prune"],
-#            ["prune", "jnf2", "compress", "quantize", "prune"],
-#            ["prune", "mdl", "compress", "quantize", "prune"],
-#            ["jnf2", "toeplitz", "mdl", "jnf2", "toeplitz", "quantize"],
-#            [],
-#            ["jnf2", "toeplitz", "mdl", "jnf2", "toeplitz", "quantize"],
-#            ["jnf2", "toeplitz", "mdl", "quantize"],
-#            ["jnf2", "toeplitz", "quantize"],
-#            ["mdl", "jnf2", "toeplitz", "mdl", "quantize"],
-#            ["mdl", "jnf2", "toeplitz", "quantize"],
-#            ["mdl", "quantize"],
-            ["whiten", "jnf2", "toeplitz", "debias", "quantize"],
+            ["whiten", "jnf", "toeplitz", "debias", "quantize"],
     ]
 
     for normalize_sequence in normalize_sequences:
@@ -101,7 +79,6 @@ if __name__ == "__main__":
         print("\n".join(["Before, average " + metric + ": " + str(result) for metric, result in zip(metrics, original_means)]))
         print("\n".join(["After, average " + metric + ": " + str(result) for metric, result in zip(metrics, evolved_means)]))
 
-        # evolution_tree.metric_names.values() is ("neurons", "weights", "biases", "norm", "hidden_dim", "loss", "accuracy", "ac_sparsity", "int_weights", "int_biases", "params")
         longest_name = max(task_names_with_trained_models, key=len)
         for task in sorted(task_names_with_trained_models):
             s = task + " "*(len(longest_name)-len(task))
@@ -109,10 +86,4 @@ if __name__ == "__main__":
                 longest_metric_value = max([len(str(evolved_results[task2][metric])) for task2 in sorted(task_names_with_trained_models)])
                 s += "  " + metric + " " + str(evolved_results[task][metric]) + " "*(longest_metric_value-len(str(evolved_results[task][metric])))
             print(s)
-        
-#        for metric in ("neurons", "weights", "hidden_dim"):
-#            for task in task_names_with_trained_models:
-#                i = metrics.index(metric)
-#                if evolved_results[task][metric] < original_results[task][metric] and evolved_results[task]["norm"] < 2*original_results[task]["norm"] and evolved_results[task]["accuracy"] >= 0.99999999:
-#                    print("Managed to reduce " + metric + " in " + task + " from " + str(original_results[task][metric]) + " to " + str(evolved_results[task][metric]) + ".")
         print("")

@@ -37,10 +37,12 @@ parser = argparse.ArgumentParser(description='Input the filename of an RNN, simp
 parser.add_argument('task', type=str, help='The name of the task')
 parser.add_argument('fname', type=str, help='The name of the model file')
 parser.add_argument('modified_fname', type=str, help='The name of the new model file to be made')
+parser.add_argument('-e', '--epsilon', type=float, help='Error tolerance', default=0.3)
 args = parser.parse_args()
 task = args.task
 fname = args.fname
 modified_fname = args.modified_fname
+epsilon = args.epsilon
 
 
 # Read search.yaml
@@ -93,41 +95,141 @@ rnn.eval()
 cumulative_product = torch.eye(hidden_dim+input_dim)
 for i in range((len(rnn.hmlp.mlp)+1)//2):
     cumulative_product = torch.matmul(rnn.hmlp.mlp[2*i].weight, cumulative_product)
-cumulative_product = cumulative_product[:,:hidden_dim]
 with torch.no_grad():
-    eigvals, eigvects = np.linalg.eig(cumulative_product.numpy())
-if hidden_dim <= 5:
-    permutations = list(map(np.array, itertools.permutations(list(range(hidden_dim)))))
-else:
-    permutations = [np.random.permutation(hidden_dim) for i in range(120)]
-with torch.no_grad():
-    best_V = None
-    best_det = 0
-    for permutation in permutations:
-        jnf = np.diag(eigvals[permutation])
-        i, j = np.indices(cumulative_product.shape)
-        jnf[i+1==j] = 1
-        S, V = np.linalg.eig(jnf)  # Vdiag(S)V^{-1}=jnf
-        det = np.abs(np.linalg.det(V))
-        if det > best_det:
-            best_det = det
-            best_V = V
-    transform = torch.tensor(eigvects.dot(np.linalg.inv(best_V)))
-    inv_transform = torch.tensor(best_V.dot(np.linalg.inv(eigvects)))
-    if transform.dtype == torch.cfloat:
-        transform = transform.real
-    if inv_transform.dtype == torch.cfloat:
-        inv_transform = inv_transform.real
+    W = cumulative_product.numpy()[:,:hidden_dim]
+
+def jcf(W):
+
+    hidden_dim = W.shape[0]
+    I = np.eye(hidden_dim)
+
+    D, M = np.linalg.eig(W)  # M D M^{-1}    ### Note: np.linalg.eig(W) doesn't always sort the eigenvalues.
+
+    equivalences = np.abs(D-D[:,np.newaxis]) < epsilon
+    for i in range(hidden_dim):
+        for j in range(hidden_dim):
+            for k in range(hidden_dim):
+                assert not (equivalences[i][j] and equivalences[j][k]) or equivalences[i][k]
+    eigvals = []
+    groups = []
+    subspace_dims = []
+
+    subspaces = []
+    for i in range(hidden_dim):
+        if np.any(equivalences[i,:i]):
+            continue
+        eigvals.append(np.mean(D[equivalences[i]]))
+        groups.append(equivalences[i])
+        subspace_dims.append(np.sum(equivalences[i].astype(np.int32)))
+        U, S, Vh = np.linalg.svd(W-eigvals[-1]*I)
+        rank = np.sum((S > epsilon).astype(np.int32))
+        subspaces.append(Vh[rank:,:].T)
+
+    cumulative_kernels = []
+    corrected_Ws = []
+    for i, (eigval, group, subspace_dim, subspace) in enumerate(zip(eigvals, groups, subspace_dims, subspaces)):
+        # construct a projector such that ker(projector) = ker(corrected_W), corrected_W = W - lambda*I
+        U, S, Vh = np.linalg.svd(W - eigval*I)
+        corrected_W = U[:,:-subspace.shape[1]].dot(np.diag(S[:-subspace.shape[1]])).dot(Vh[:-subspace.shape[1],:])  # = W - lambda*I (with perfect nullspace)
+        corrected_Ws.append(corrected_W)
+
+    differential_kernels = []
+    for subspace, corrected_W in zip(subspaces, corrected_Ws):
+        differential_kernel = subspace
+        differential_kernels.append([differential_kernel])
+        for i in range(hidden_dim-1):
+            U, S, Vh = np.linalg.svd((I-differential_kernel.dot(differential_kernel.T)).dot(corrected_W))
+            rank = np.sum((S > epsilon).astype(np.int32))
+            differential_kernel_union_subspace = Vh[rank:,:].T
+            U, S, Vh = np.linalg.svd(differential_kernel_union_subspace.dot(differential_kernel_union_subspace.T) - subspace.dot(subspace.T))
+            differential_kernel = U[:,:hidden_dim-rank - subspace.shape[1]]
+            differential_kernels[-1].append(differential_kernel)
+
+        differential_kernels[-1].append(np.zeros([hidden_dim, 0]))
+
+    blocks = []
+    for differential_kernel, corrected_W in zip(differential_kernels, corrected_Ws):
+        blocks.append([])
+        for power, (span1, span2) in reversed(list(enumerate(zip(differential_kernel[:-1], differential_kernel[1:])))):
+            assert span1.shape[1] >= span2.shape[1]
+            mapped_span2 = np.linalg.svd(corrected_W.dot(span2))[0][:,:span2.shape[1]]
+            extra_vectors = [np.linalg.svd(span1.dot(span1.T) - mapped_span2.dot(mapped_span2.T))[2][:span1.shape[1]-span2.shape[1],:].T]
+            for power2, kernel in reversed(list(enumerate(differential_kernel[:power]))):
+                extra_vectors.append(kernel.dot(kernel.T).dot(corrected_W).dot(extra_vectors[-1]))
+            blocks[-1].append(np.stack(extra_vectors[::-1], axis=2).reshape((hidden_dim, (span1.shape[1] - span2.shape[1])*(power+1))))
+
+    transform = np.concatenate([np.concatenate(block, axis=1) for block in blocks], axis=1)
+
+    assert transform.shape[0] == transform.shape[1], transform.shape
 
 
+    taken = [False for i in range(hidden_dim)]
+    pairs = []
+    for i in range(hidden_dim):
+        print(i, end=" ")
+        if not taken[i]:
+            if np.all(transform[:,i].imag == 0):
+                taken[i] = True
+                pairs.append((i,))
+                print()
+            else:
+                j = np.argmin(np.sum(np.abs(transform[:,i:i+1].conj() - transform)**2, axis=0))
+                print(j)
+                assert j > i
+                taken[i] = True
+                taken[j] = True
+                pairs.append((i, j))
+        else:
+            print()
+
+    realifier = np.zeros((hidden_dim, hidden_dim), dtype=np.complex64)
+    for pair in pairs:
+        if len(pair) == 1:
+            realifier[pair[0],pair[0]] = 1
+        elif len(pair) == 2:
+            realifier[pair[0],pair[0]] = 1/np.sqrt(2)
+            realifier[pair[0],pair[1]] = 1j/np.sqrt(2)
+            realifier[pair[1],pair[0]] = 1/np.sqrt(2)
+            realifier[pair[1],pair[1]] = -1j/np.sqrt(2)
+
+    net_transform = transform.dot(realifier).real
+
+    return net_transform
+
+
+def accurate_jcf(W):
+    net_transform = np.eye(W.shape[0])
+    for i in range(3):
+        try:
+            transform = jcf(np.linalg.inv(net_transform).dot(W).dot(net_transform)).real
+            net_transform = net_transform.dot(transform)
+        except:
+            pass
+    return net_transform
+
+transform = accurate_jcf(W)
+inv_transform = torch.tensor(np.linalg.inv(transform)).type(rnn.hmlp.mlp[-1].weight.dtype)
+transform = torch.tensor(transform).type(rnn.hmlp.mlp[-1].weight.dtype)
+
 with torch.no_grad():
+    original1 = rnn.hmlp.mlp[-1].weight
+    original2 = rnn.hmlp.mlp[-1].bias
+    original3 = rnn.hmlp.mlp[0].weight
+    original4 = rnn.ymlp.mlp[0].weight
     rnn.hmlp.mlp[-1].weight = nn.Parameter(torch.matmul(inv_transform, rnn.hmlp.mlp[-1].weight))
     rnn.hmlp.mlp[-1].bias = nn.Parameter(torch.matmul(inv_transform, rnn.hmlp.mlp[-1].bias))
     rnn.hmlp.mlp[0].weight = nn.Parameter(torch.cat([torch.matmul(rnn.hmlp.mlp[0].weight[:,:hidden_dim], transform), rnn.hmlp.mlp[0].weight[:,hidden_dim:]], dim=1))
     rnn.ymlp.mlp[0].weight = nn.Parameter(torch.matmul(rnn.ymlp.mlp[0].weight, transform))
+    exploded = False
+    for result in (rnn.hmlp.mlp[-1].weight, rnn.hmlp.mlp[-1].bias, rnn.hmlp.mlp[0].weight, rnn.ymlp.mlp[0].weight):
+        exploded = exploded or not torch.all(torch.isfinite(result)) or torch.any(torch.abs(result) > 1e4)
+    if exploded:
+        rnn.hmlp.mlp[-1].weight = nn.Parameter(original1)
+        rnn.hmlp.mlp[-1].bias = nn.Parameter(original2)
+        rnn.hmlp.mlp[0].weight = nn.Parameter(original3)
+        rnn.ymlp.mlp[0].weight = nn.Parameter(original4)
 
 # Put the new weights and biases into modified_model.pt
 torch.save(rnn.state_dict(), modified_fname)
 
 print('Transformed RNN hidden space using matrix: ' + str(transform))
-
