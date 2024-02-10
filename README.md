@@ -17,57 +17,45 @@
 \_______________________/<------------------------------------------------------+
 ```
 
-## Development notes
-- [] Set torch seed in all `create_dataset.py` scripts and re-run.
+## Summary and State
 
-## Structure
-```
-.
-├── literature
-├── models
-├── neural_verification
-│   ├── neural_verification.py
-│   └── setup.py
-├── README.md
-├── scripts
-|   ├── rnn_architecture_search.py
-|   └── rnn_train.py
-└── tasks
-    ├── palindromes
-        ├── config.py
-        ├── create_dataset.py
-        └── train.py
-├── normalizers
-│   ├── make_example_MLP.py
-│   ├── delete_dead_neurons.py
-│   ├── combine_duplicate_neurons.py
-    ...
-```
-For each task, we create a directory under `tasks/` and create scripts for defining the dataset and for training a network. At a minimum, the code in a task's directory should produce train and test datasets for the task and also save the weights of a model which was trained on the train set and achieves good performance on the test set. Do not commit large files to git! Datasets and model weights, unless they are extremely small, should be uploaded to the shared Dropbox folder: https://www.dropbox.com/scl/fo/deeu5ifrpi8vn8hnujlwc/h?rlkey=zpo1ebv08wazrzrxc7rpn9pct&dl=0
+This is the repository for the preprint "Opening the AI black box: program synthesis via mechanistic interpretability" (https://arxiv.org/abs/2402.05110). Some parts of our pipeline haven't been added yet to the repository. If you'd like to get these asap, please email me at `ericjm` [at] `mit.edu`. 
 
+In this repository currently are the parts of the pipeline needed to create datasets for our tasks and then perform an architecture search on each task to find the smallest RNN capable of solving each one.
 
-## Installation
+## Creating task datasets
 
-We've defined several helpful objects (data loaders, tokenizer, and a transformer implementation) inside of the `neural-verification` module, which you can install with:
+Inside the `tasks` directory are a variety of folders each containing a `create_dataset.py` script. To create the dataset for a task, you can just run this script in the corresponding folder. This will create a `data.pt` file in the task's folder with 1e6 sample sequences, split in to train and test sets.
 
+## Installing the neural-verification module
+We define several helpful objects (the RNN model, data loaders, etc.) inside of the `neural-verification` module, which you can install with:
 ```
 pip install -e neural_verification
 ```
-This requires PyTorch
+This requires PyTorch.
 
-## Running architecture search
-You can perform an architecture search on a task by running the `scripts/rnn_architecture_search.py` script. For example, to run an architecture search on the `rnn_prev2_numerical` task, you could run something like:
-```
-python scripts/rnn_architecture_search.py --data tasks/rnn_prev2_numerical/data.pt --loss_fn "log" --input_dim 1 --output_dim 1 --seeds-per-run 3 --save_dir tasks/rnn_prev2_numerical/arch --steps 5000
-```
-There are many choices involved in running this script. Inside `scripts/rnn_architecture_search.py`, we basically run `scripts/rnn_train.py` with many different arguments, so you could take a look at that script to see what arguments are available. The most important arguments are the `--loss_fn` argument for choosing between "mse", "log", and "cross_entropy". The "log" option is the 0.5*log(1+x^2) loss function. There is also a flag `--vectorize_input` which will turn ints into
-one-hot vectors before passing them to the network. This shouldn't be used for "numerical" tasks where the input is a 1d
-vector, but is useful for tasks where the input is something categorical -- for instance if inputs are letters, you may
-want the inputs to be one-hot vectors of length 26. You'll also have to choose the `--input_dim` and `--output_dim` arguments
-to match the task. For instance, in the example I just gave where the input is a one-hot vector of length 26, you would
-set `--input_dim 26`. The `--seeds-per-run` argument controls how many different seeds to use for each architecture. The
-`--steps` argument controls how many steps to train for.
+## Training RNNs (architecture search)
 
-With this script, you really just need to create a dataset of input and output tensors. The script should flexible enough
-to handle the input sequences which are just a 1d list of real numbers, but can also handle input sequences which are
-a list of higher-dimensional vectors. 
+To perform an architecture search across a set of tasks, one can run the `scripts/rnn_architecture_search.py` script like so:
+```
+python scripts/rnn_architecture_search.py --config first_paper_final.yaml --tasks_dir tasks/ --architecture_search_script scripts/rnn_architecture_search.py --save_dir arch_search
+```
+
+The `--config` argument specifies a yaml file containing the args to pass to the `rnn_architecture_search.py` script for each task. It will run the architecture search on each task with a separate slurm job.
+
+
+## Hammering RNNs
+TODO
+
+## Extraction of variables with integer autoencoder
+TODO
+
+## Symbolic regression
+TODO
+
+## Comparison to GPT-4
+TODO
+
+## A note on naming conventions
+We changed the names of the tasks for the paper, and we still need to rename the tasks in this repository to reflect that.
+
