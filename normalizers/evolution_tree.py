@@ -6,8 +6,6 @@ import numpy as np
 import pickle
 import subprocess
 
-from neural_verification import MLP
-
 
 class EvolutionTree():
     """
@@ -15,9 +13,11 @@ class EvolutionTree():
 
     All the raw models can be found in one folder raw_models_path, and they each map to models in processed_models_path, where the files have the same name. There are additional models in processed_models_path, and they come in a tree structure. model_locations tells you which paths to take to get to any given model in the tree, while model_tree tells you what paths are available at any given model in the tree. model_parents tells you which model is the parent of any given model.
     """
-    def __init__(self, raw_models_path, processed_models_path):
+    def __init__(self, raw_models_path, processed_models_path, task):
         self.raw_models_path = raw_models_path
         self.processed_models_path = processed_models_path
+        os.makedirs(self.processed_models_path, exist_ok=True)
+        self.task = task
         self.children = dict()
         self.parents = dict()
         self.roots = set()
@@ -31,36 +31,10 @@ class EvolutionTree():
             processed_model_path = os.path.join(self.processed_models_path, file_name)
 
             # Get the weights and biases
-            original_weights = torch.load(raw_model_path, map_location=torch.device('cpu'))
-            if tuple(sorted(original_weights.keys())) == tuple(sorted(['mlp.0.weight', 'mlp.0.bias', 'mlp.2.weight', 'mlp.2.bias'])):
-                key1_key2_pairs = [('mlp.0.weight', 'linears.0.weight'), ('mlp.0.bias', 'linears.0.bias'), ('mlp.2.weight', 'linears.1.weight'), ('mlp.2.bias', 'linears.1.bias')]
-                original_weights = {key2:original_weights[key1] for (key1, key2) in key1_key2_pairs}
-            elif tuple(sorted(original_weights.keys())) == tuple(sorted(['linears.' + str(i) + '.weights' for i in range(int(len(original_weights)//2))] + ['linears.' + str(i) + '.bias' for i in range(int(len(original_weights)//2))])):
-                pass
-            else:
-                print(original_weights.keys())
-                raise ValueError
-            prefix = 'linears.'
-            original_shape = [original_weights[prefix + '0.bias'].shape[0]] + [original_weights[prefix + str(i) + '.bias'].shape[0] for i in range(int(len(original_weights)//2))]
-            weights = [original_weights[prefix + str(i) + '.weight'].numpy() for i in range(int(len(original_weights)//2))]
-            biases = [original_weights[prefix + str(i) + '.bias'].numpy() for i in range(int(len(original_weights)//2))]
-
-            # Make a model in a standard way with them
-            shp = [weights[0].shape[1]] + [bias.shape[0] for bias in biases]
-            depth = len(shp)-1
-            width = max(shp[1:-1])
-            in_dim = shp[0]
-            out_dim = shp[-1]
-            model = MLP(in_dim=in_dim, out_dim=out_dim, width=width, depth=depth)
-            linear_list = []
-            for i in range(depth):
-                linear_list.append(nn.Linear(shp[i], shp[i+1]))
-            model.linears = nn.ModuleList(linear_list)
-            model.shp = shp
-            model.load_state_dict(original_weights)
+            weights = torch.load(raw_model_path, map_location=torch.device('cpu'))
 
             # Save the model
-            torch.save(model.state_dict(), processed_model_path)
+            torch.save(weights, processed_model_path)
 
             self.roots.add(file_name)
             if file_name not in self.children:
@@ -118,11 +92,17 @@ class EvolutionTree():
             f.write(s)
 
     def simplify(self, model, new_model, simplifier, other_options):  # other_options is a list full of arguments to the argparsed python files which perform model simplification, this list is in the order defined by the simplifiers_information variable.
-        arguments = ["python", simplifier, processed_models_path + model[model.find("/")+1:], processed_models_path + new_model[new_model.find("/")+1:]] + sum([[option_name, option_value] for option_name, option_value in zip(simplifiers_information[simplifier], other_options)], [])
-        print(arguments)
-        subprocess.run(arguments)
-        shortened_model = model[model.find("/")+1:]
-        shortened_new_model = new_model[new_model.find("/")+1:]
+        arguments = ["python", simplifier, self.task, self.processed_models_path + model[model.rfind("/")+1:], self.processed_models_path + new_model[new_model.rfind("/")+1:]] + sum([[option_name, option_value] for option_name, option_value in zip(simplifiers_information[simplifier], other_options)], [])
+        result = subprocess.run(arguments, capture_output=True, text=True)
+        stdout = result.stdout
+        stderr = result.stderr
+#        print(stdout)
+        if stderr:
+            print(arguments)
+            print(stdout)
+            raise ValueError(stderr)
+        shortened_model = model[model.rfind("/")+1:]
+        shortened_new_model = new_model[new_model.rfind("/")+1:]
         self.children[shortened_model].add(shortened_new_model)
         self.children[shortened_new_model] = set()
         self.parents[shortened_new_model] = shortened_model
@@ -131,79 +111,142 @@ class EvolutionTree():
 
     def evaluate_metrics(self, model):
         results = {}
-        for metric_file, (metric_name, search_word) in metric_names.items():
-            arguments = ["python", metric_file, processed_models_path + model]
-            print(arguments)
+        for metric_file, output_entries in metric_names.items():
+            arguments = ["python", metric_file, self.task, self.processed_models_path + model]
             result = subprocess.run(arguments, capture_output=True, text=True)
             stdout = result.stdout
             stderr = result.stderr
-            print(stdout)
-            metric_value = float(stdout[stdout.find(search_word)+len(search_word):])
-            results[metric_name] = metric_value
+            if stderr:
+                print(arguments)
+                print(stdout)
+                raise ValueError(stderr)
+            for metric_name, search_word in output_entries:
+                start_position = stdout.find(search_word)+len(search_word)
+                end_position = stdout.find("\n", start_position)
+                metric_value = float(stdout[start_position:end_position])
+                results[metric_name] = metric_value
         return results
             
 
-
 simplifiers_information = {
-        "normalizers/combine_duplicate_neurons_mlp.py": ("-t", "-e"),
-        "normalizers/delete_dead_neurons_mlp.py": ("-t",),
-        "normalizers/normalize_weights_mlp.py": (),
-        "normalizers/retrain_mlp.py": ("-n", "-l"),
-        "normalizers/sort_neurons_mlp.py": (),
-        "normalizers/L1_retrain_mlp.py": ("-n", "-l", "-r"),
+        "normalizers/prune_dead_neurons_rnn.py": ("-t",),
+        "normalizers/rotate_hidden_space.py": ("-t",),
+        "normalizers/align_hidden_space.py": ("-t",),
+        "normalizers/diagonalize_transition.py": (),
+        "normalizers/jnf_transition.py": (),
+        "normalizers/jnf_transition2.py": ("-e",),
+        "normalizers/toeplitz.py": (),
+        "normalizers/minimize_description_length.py": ("-t",),
+        "normalizers/rescale_input.py": (),
+        "normalizers/rescale_output.py": (),
+        "normalizers/prune_hidden_dim.py": ("-t",),
+        "normalizers/quantize_weights.py": ("-t",),
+        "normalizers/whitening.py": ("-e",),
+        "normalizers/debias.py": ("-e",),
+        "normalizers/noread.py": ("-e",),
+        "normalizers/activation_pruner.py": ("-e",),
+        "normalizers/rescale_relu.py": (),
+}
+default_parameters = {
+        "normalizers/prune_dead_neurons_rnn.py": (0.1,),
+        "normalizers/rotate_hidden_space.py": (500,),
+        "normalizers/align_hidden_space.py": (500,),
+        "normalizers/diagonalize_transition.py": (),
+        "normalizers/jnf_transition.py": (),
+        "normalizers/jnf_transition2.py": (0.7,),
+        "normalizers/toeplitz.py": (),
+        "normalizers/minimize_description_length.py": (800,),
+        "normalizers/rescale_input.py": (),
+        "normalizers/rescale_output.py": (),
+        "normalizers/prune_hidden_dim.py": (0.1,),
+        "normalizers/quantize_weights.py": (0.01,),
+        "normalizers/whitening.py": (0.1,),
+        "normalizers/debias.py": (0.1,),
+        "normalizers/noread.py": (0.1,),
+        "normalizers/activation_pruner.py": (0.01,),
+        "normalizers/rescale_relu.py": (),
 }
 simplifier_short_names = {
-        "normalizers/combine_duplicate_neurons_mlp.py": "deduplicate",
-        "normalizers/delete_dead_neurons_mlp.py": "prune",
-        "normalizers/normalize_weights_mlp.py": "normalize",
-        "normalizers/retrain_mlp.py": "retrain",
-        "normalizers/sort_neurons_mlp.py": "sort",
-        "normalizers/L1_retrain_mlp.py": "L1",
+        "normalizers/prune_dead_neurons_rnn.py": "prune",
+        "normalizers/rotate_hidden_space.py": "rotate",
+        "normalizers/align_hidden_space.py": "align",
+        "normalizers/diagonalize_transition.py": "diagonalize",
+        "normalizers/jnf_transition.py": "jnf",
+        "normalizers/jnf_transition2.py": "jnf2",
+        "normalizers/toeplitz.py": "toeplitz",
+        "normalizers/minimize_description_length.py": "mdl",
+        "normalizers/rescale_input.py": "inrescale",
+        "normalizers/rescale_output.py": "outrescale",
+        "normalizers/prune_hidden_dim.py": "compress",
+        "normalizers/quantize_weights.py": "quantize",
+        "normalizers/whitening.py": "whiten",
+        "normalizers/debias.py": "debias",
+        "normalizers/noread.py": "noread",
+        "normalizers/activation_pruner.py": "actreduce",
+        "normalizers/rescale_relu.py": "reluscale",
 }
-
 metric_names = {
-        "metrics/loss_mlp.py": ("loss", "Loss: "),
-        "metrics/weight_norm_mlp.py": ("norm", "Norm: "),
-        "metrics/neuron_count_mlp.py": ("neurons", "Neurons: "),
-        "metrics/sparsity_mlp.py": ("weights", "Weights: "),
+        "metrics/all_rnn.py": (
+            ("neurons", "Neurons: "),
+            ("weights", "Weights: "),
+            ("biases", "Biases: "),
+            ("norm", "Weight norm: "),
+            ("hidden_dim", "Hidden dim: "),
+            ("loss", "Loss: "),
+            ("accuracy", "Accuracy: "),
+            ("ac_sparsity", "Activation sparsity: "),
+            ("int_weights", "Integer weights: "),
+            ("int_biases", "Integer biases: "),
+            ("params", "Parameters: "),
+        ),
 }
 
+if __name__ == "__main__":
 
-raw_models_path = "./raw_models/"
-processed_models_path = "./processed_models/"
-print("Making evolution tree for models in " + processed_models_path + ".")
-evolution_tree = EvolutionTree(raw_models_path, processed_models_path)
-tree_fname = "evolution_tree"
-log_fname = "evolution_tree.txt"
-if os.path.exists(tree_fname):
-    print("Loading evolution tree from " + tree_fname + ".")
-    evolution_tree.load_tree(tree_fname)
-else:
-    print("Constructing new evolution tree from models in " + raw_models_path + ".")
-    evolution_tree.init_from_raw_models()
+    ### Two usage options:
+    ### python evolution_tree.py <task_name>
+    ### python evolution_tree.py <task_name> <simplifier> <model> <options...>
 
-if len(sys.argv) == 2:
-    other_args = sys.argv[1:]
-    simplifier = sys.argv[1]
-    raise ValueError("User requests to use the " + simplifier + " simplifier, but must also request a model.")
-elif len(sys.argv) >= 3:
-    other_args = sys.argv[1:]
-    simplifier = sys.argv[1]
-    model = sys.argv[2]
-    print("User requests to use the " + simplifier + " simplifier on the " + model + " model.")
-    other_options = sys.argv[3:]
-    new_model = model[:-3] + "_" + "_".join([simplifier_short_names[simplifier]] + other_options) + ".pt"
-    if simplifier not in simplifiers_information:
-        raise ValueError("Not a valid simplifier name: " + simplifier_args_and_dict["name"])
-    elif len(other_options) != len(simplifiers_information[simplifier]):
-        helper_string = subprocess.run(["python", simplifier, "--help"])
-        raise ValueError("Invalid number of arguments for using the chosen simplifier model. Help information:\n" + helper_string)
-    evolution_tree.simplify(model, new_model, simplifier, other_options)
-else:
-    print("User did not choose to use a simplifier.")
+    raw_models_path = "./rnn_tests/raw_models/"
+    processed_models_path = "./rnn_tests/processed_models/"
+    task = sys.argv[1]
+    print(raw_models_path)
+    print(task)
+    assert os.path.exists(raw_models_path + task + "/")
+    raw_models_path = raw_models_path + task + "/"
+    processed_models_path = processed_models_path + task + "/"
+
+    print("Making evolution tree for models in " + processed_models_path + ".")
+    evolution_tree = EvolutionTree(raw_models_path, processed_models_path, task)
+    tree_fname = "./rnn_tests/evolution_tree_" + task
+    log_fname = "./rnn_tests/evolution_tree_" + task + ".txt"
+    if os.path.exists(tree_fname):
+        print("Loading evolution tree from " + tree_fname + ".")
+        evolution_tree.load_tree(tree_fname)
+    else:
+        print("Constructing new evolution tree from models in " + raw_models_path + ".")
+        evolution_tree.init_from_raw_models()
+
+    if len(sys.argv) == 3:
+        simplifier = sys.argv[2]
+        raise ValueError("User requests to use the " + simplifier + " simplifier, but must also request a model.")
+    elif len(sys.argv) >= 4:
+        simplifier = sys.argv[2]
+        model = sys.argv[3]
+        print("User requests to use the " + simplifier + " simplifier on the " + model + " model.")
+        other_options = sys.argv[4:]
+        new_model = model[:-3] + "_" + "_".join([simplifier_short_names[simplifier]] + other_options) + ".pt"
+        if simplifier not in simplifiers_information:
+            raise ValueError("Not a valid simplifier name: " + simplifier_args_and_dict["name"])
+        elif len(other_options) != len(simplifiers_information[simplifier]):
+            helper_string = subprocess.run(["python", simplifier, "--help"])
+            raise ValueError("Invalid number of arguments for using the chosen simplifier model. Help information:\n" + helper_string)
+        evolution_tree.simplify(model, new_model, simplifier, other_options)
+    else:
+        print("User did not choose to use a simplifier.")
 
 
-print("Saving evolution tree in " + tree_fname + ".")
-evolution_tree.save_tree(tree_fname)
-print("Drawing evolution tree in " + log_fname + ".")
-evolution_tree.log_tree(log_fname)
+    print("Saving evolution tree in " + tree_fname + ".")
+    evolution_tree.save_tree(tree_fname)
+    print("Drawing evolution tree in " + log_fname + ".")
+    evolution_tree.log_tree(log_fname)
