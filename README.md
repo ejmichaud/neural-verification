@@ -60,14 +60,53 @@ You can perform an architecture search on a task by running the `scripts/rnn_arc
 ```
 python scripts/rnn_architecture_search.py --data tasks/rnn_prev2_numerical/data.pt --loss_fn "log" --input_dim 1 --output_dim 1 --seeds-per-run 3 --save_dir tasks/rnn_prev2_numerical/arch --steps 5000
 ```
-There are many choices involved in running this script. Inside `scripts/rnn_architecture_search.py`, we basically run `scripts/rnn_train.py` with many different arguments, so you could take a look at that script to see what arguments are available. The most important arguments are the `--loss_fn` argument for choosing between "mse", "log", and "cross_entropy". The "log" option is the 0.5*log(1+x^2) loss function. There is also a flag `--vectorize_input` which will turn ints into
+There are many choices involved in running this script. Inside `scripts/rnn_architecture_search.py`, we run `scripts/rnn_train.py` with many different arguments, so you could take a look at that script to see what arguments are available. The most important arguments are the `--loss_fn` argument for choosing between "mse", "log", and "cross_entropy". The "log" option is the 0.5*log(1+x^2) loss function. There is also a flag `--vectorize_input` which will turn ints into
 one-hot vectors before passing them to the network. This shouldn't be used for "numerical" tasks where the input is a 1d
-vector, but is useful for tasks where the input is something categorical -- for instance if inputs are letters, you may
+vector, but is useful for tasks where the input is categorical -- for instance, if inputs are letters, you may
 want the inputs to be one-hot vectors of length 26. You'll also have to choose the `--input_dim` and `--output_dim` arguments
 to match the task. For instance, in the example I just gave where the input is a one-hot vector of length 26, you would
 set `--input_dim 26`. The `--seeds-per-run` argument controls how many different seeds to use for each architecture. The
 `--steps` argument controls how many steps to train for.
 
-With this script, you really just need to create a dataset of input and output tensors. The script should flexible enough
-to handle the input sequences which are just a 1d list of real numbers, but can also handle input sequences which are
+With this script, you just need to create a dataset of input and output tensors. The script should be flexible enough
+to handle the input sequences which are just a 1d list of real numbers, but can also handle input sequences that are
 a list of higher-dimensional vectors. 
+
+## Running the GPT Baseline
+
+### Set-Up
+To run the GPT baseline on your dataset, you will first need to input your OpenAI token into `/gpt4/prompt.py`. Enter your API key here:
+
+```python
+api_key = "your-key-here"
+```
+
+#### Running the baseline for a single task
+
+To run the baseline for a single task, use the following command:
+
+```sh
+python prompt.py --task <task_name> --iterations <number_of_iterations>
+```
+
+Replace `<task_name>` with one of the tasks listed in `/tasks/`. The `<number_of_iterations>` parameter repeats the run for a fixed number, increasing the chance of successfully discovering an algorithm. The default value for iterations is 3.
+
+#### Running the baseline for all tasks
+
+To automatically prompt GPT for all tasks listed at the start of the file in `/gpt4/prompt_all.py`, use the following command:
+
+```sh
+python prompt_all.py --iterations <number_of_iterations>
+```
+
+Here, `<number_of_iterations>` specifies how many times each task should be repeated.
+
+#### Extracting results and creating a table
+
+To extract the results and generate a `tasks_results.csv` table, run the following command:
+
+```sh
+python run_extracted_code.py
+```
+
+This command will save all the results in the `task_results.csv` file.
