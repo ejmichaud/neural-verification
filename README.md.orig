@@ -34,6 +34,7 @@ pip install -e neural_verification
 ```
 This requires PyTorch.
 
+<<<<<<< HEAD
 ## Training RNNs (architecture search)
 
 To perform an architecture search across a set of tasks, one can run the `scripts/rnn_architecture_search.py` script like so:
@@ -45,53 +46,7 @@ The `--config` argument specifies a yaml file containing the args to pass to the
 
 
 ## Hammering RNNs
-
-The `normalizers` folder contains tools for operating different normalizers which can be used to simplify neural networks. A normalizer tries to reduce a neural network into it's "normal form", a standard form of sorts which all neural networks that use the same algorithm can be reduced to.
-
-Currently, we have normalizers that work on RNNs from `neural_verification/neural_verification.py`.
-
-To operate the normalizer system:
-1. `cd` to the `normalizers` directory.
-2. Modify and use transfer.py to copy all the `model_perfect.pt` from a folder of task folders to `rnn_tests/raw_models/`.
-3. Run `automatic_evolution.py` in order to run the normalizer sequence: [whitening, Jordan normal form, Toeplitz, de-biasing, quantization] on all the copied models.
-4. Modify and use transfer.py to copy all the hammered models from `rnn_tests/raw_models/` to some destination folder.
-
-A lot of tools can be used along the way to look into the above process:
-1. To use a single normalizer on a single model, you run `evolution_tree.py`, via the line: `python evolution_tree.py normalizers/<normalizer>.py processed_models/<model>.pt <normalizer_arg1> <normalizer_arg2> ...`
-`rnn_tests/evolution_tree_*` are all files which store and display all of the models that have been in the normalization system so far, and all measurements of the models.
-2. We can view the model weights using `inspect_model.py`, which is easily modifiable for us to perform and print the results of basic computations using the weights.
-3. We can view all the weights of all the models using `print_model_weights.py`.
-4. We can summarize the overall effect of all the normalizers averaged over the models, using `summary_statistics.py`.
-
-Folder structure:
-```
-normalizers
-├── normalizers
-|   ├── debias.py
-|   ├── jnf_transition.py
-|   ├── quantize_weights.py
-|   ├── toeplitz.py
-|   └── whitening.py
-├── metrics
-│   └── all_rnn.py
-├── rnn_tests
-│   ├── hammered_models
-│   ├── processed_models
-│   └── raw_models
-│       ├── task1
-│       │   └── model_perfect.pt
-│       ├── task2
-│       │   └── model_perfect.pt
-│       ...
-├── automatic_evolution.py
-├── evolution_tree.py
-├── inspect_model.py
-├── print_all_weights.py
-├── readme.md
-├── summary_statistics.py
-└── transfer.py
-```
-
+TODO
 
 ## Extraction of variables with integer autoencoder
 TODO
@@ -100,6 +55,31 @@ TODO
 TODO
 
 ## Comparison to GPT-4
+TODO
+
+## A note on naming conventions
+We changed the names of the tasks for the paper, and we still need to rename the tasks in this repository to reflect that.
+
+=======
+## Running architecture search
+You can perform an architecture search on a task by running the `scripts/rnn_architecture_search.py` script. For example, to run an architecture search on the `rnn_prev2_numerical` task, you could run something like:
+```
+python scripts/rnn_architecture_search.py --data tasks/rnn_prev2_numerical/data.pt --loss_fn "log" --input_dim 1 --output_dim 1 --seeds-per-run 3 --save_dir tasks/rnn_prev2_numerical/arch --steps 5000
+```
+There are many choices involved in running this script. Inside `scripts/rnn_architecture_search.py`, we run `scripts/rnn_train.py` with many different arguments, so you could take a look at that script to see what arguments are available. The most important arguments are the `--loss_fn` argument for choosing between "mse", "log", and "cross_entropy". The "log" option is the 0.5*log(1+x^2) loss function. There is also a flag `--vectorize_input` which will turn ints into
+one-hot vectors before passing them to the network. This shouldn't be used for "numerical" tasks where the input is a 1d
+vector, but is useful for tasks where the input is categorical -- for instance, if inputs are letters, you may
+want the inputs to be one-hot vectors of length 26. You'll also have to choose the `--input_dim` and `--output_dim` arguments
+to match the task. For instance, in the example I just gave where the input is a one-hot vector of length 26, you would
+set `--input_dim 26`. The `--seeds-per-run` argument controls how many different seeds to use for each architecture. The
+`--steps` argument controls how many steps to train for.
+
+With this script, you just need to create a dataset of input and output tensors. The script should be flexible enough
+to handle the input sequences which are just a 1d list of real numbers, but can also handle input sequences that are
+a list of higher-dimensional vectors. 
+
+## Running the GPT Baseline
+
 ### Set-Up
 To run the GPT baseline on your dataset, you will first need to input your OpenAI token into `/gpt4/prompt.py`. Enter your API key here:
 
@@ -136,7 +116,4 @@ python run_extracted_code.py
 ```
 
 This command will save all the results in the `task_results.csv` file.
-
-## A note on naming conventions
-We changed the names of the tasks for the paper, and we still need to rename the tasks in this repository to reflect that.
-
+>>>>>>> gpt
