@@ -94,20 +94,20 @@ normalizers
 
 ## MIPS: Converting trained NNs into python code
 ### Setup
-1. cd into the folder ./regression.
-2. Download the folder called "first_paper" from dropbpx: https://www.dropbox.com/scl/fo/fqhm7v8euiduchm4eke8b/h?rlkey=pp99bo9v1cgth6os51ro1ejcq&dl=0 which contains already trained models.
-3. Raname the folder from "first_paper" to "tasks".
-4. Open run.ipynb, click and run! Notice in the ./programs folder, txt files are generated which contain the MIPS-generated python programs. And the csv file ./results.csv is a table summarizing the task, success or failure, and (if success) which regression method nailed the task.
+1. cd into the folder `./regression`.
+2. Download the folder called `first_paper` from dropbpx: https://www.dropbox.com/scl/fo/fqhm7v8euiduchm4eke8b/h?rlkey=pp99bo9v1cgth6os51ro1ejcq&dl=0 which contains already trained models.
+3. Raname the folder from `first_paper` to `tasks`.
+4. Open `run.ipynb`, click and run! Notice in the `./programs` folder, txt files are generated which contain the MIPS-generated python programs. And the csv file ./results.csv is a table summarizing the task, success or failure, and (if success) which regression method nailed the task.
 
 That's it! In case you want to dig into details about how MIPS is implemented, here is some brief summary of these methods and where to find these files.
 #### Extraction of variables with integer autoencoder
-We find that integer lattices are prevalent in RNN hidden space, for almost all tasks we reporeted in the paper. So we come up with integer autoencoders to convert numerical hidden states into integer lattices. We implment two methods (linear autoencoder and GCD autoencoder) in ./regression/integer_autoencoder.py. In ./regression/auto_encode_RNN.py, we run linear autoencoder and GCD autoencoders with different hyperparameters and select the best integer lattice in terms of minimal description length.
+We find that integer lattices are prevalent in RNN hidden space, for almost all tasks we reporeted in the paper. So we come up with integer autoencoders to convert numerical hidden states into integer lattices. We implment two methods (linear autoencoder and GCD autoencoder) in `./regression/integer_autoencoder.py`. In `./regression/auto_encode_RNN.py`, we run linear autoencoder and GCD autoencoders with different hyperparameters and select the best integer lattice in terms of minimal description length.
 
 #### Regression methods
 After the integer lattice is found, we try three regression methods:
-1. Linear regression, implemented in ./regression/linear_regression.ipynb
-2. Boolean regression, implemented in ./regression/boolean_regression.ipynb
-3. Symbolic regression, implemented in ./regression/symbolic_regression.ipynb and ./regression/symbolic_regression
+1. Linear regression, implemented in `./regression/linear_regression.ipynb`
+2. Boolean regression, implemented in `./regression/boolean_regression.ipynb`
+3. Symbolic regression, implemented in `./regression/symbolic_regression.ipynb` and `./regression/symbolic_regression`
 
 ## Comparison to GPT-4
 ### Set-Up
